@@ -1,10 +1,40 @@
 (function() {
+    // 1. KONFIGURASI TARGET SCREENER & GOOGLE APPS SCRIPT (GAS)
+    const SCREENER_CONFIGS = {
+        "FINAL BPJS - ONE DAY TRADE": {
+            sheet: "SC",
+            startCol: "T",
+            gasUrl: "https://script.google.com/macros/s/AKfycbz_GANTI_DENGAN_URL_GAS_LU/exec"
+        },
+        "BD SANGKUT": {
+            sheet: "SC",
+            startCol: "AA",
+            gasUrl: "https://script.google.com/macros/s/AKfycbz_GANTI_DENGAN_URL_GAS_LU/exec"
+        },
+        "REMORA": {
+            sheet: "SC",
+            startCol: "AH",
+            gasUrl: "https://script.google.com/macros/s/AKfycbz_GANTI_DENGAN_URL_GAS_LU/exec"
+        },
+        "SIDEWAYS 1": {
+            sheet: "SC",
+            startCol: "AO",
+            gasUrl: "https://script.google.com/macros/s/AKfycbz_GANTI_DENGAN_URL_GAS_LU/exec"
+        },
+        "SIDEWAYS 2": {
+            sheet: "SC",
+            startCol: "AV",
+            gasUrl: "https://script.google.com/macros/s/AKfycbz_GANTI_DENGAN_URL_GAS_LU/exec"
+        }
+    };
+
+    // Toggle Dashboard Overlay
     if (document.getElementById('sb-full-dashboard')) {
         document.getElementById('sb-full-dashboard').remove();
         return;
     }
 
-    // CREATE FULLSCREEN OVERLAY
+    // 2. CREATE FULLSCREEN OVERLAY UI
     const overlay = document.createElement('div');
     overlay.id = 'sb-full-dashboard';
     overlay.style = `
@@ -18,7 +48,7 @@
         <div style="max-width: 1100px; margin: 0 auto;">
             
             <!-- HEADER SECTION -->
-            <div style="background: #111827; border: 1px solid #1f2937; border-radius: 16px; padding: 24px; display: flex; justify-content: space-between; align-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+            <div style="background: #111827; border: 1px solid #1f2937; border-radius: 16px; padding: 24px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
                 <div>
                     <div style="display: flex; align-items: center; gap: 12px;">
                         <div style="background: #059669; padding: 8px; border-radius: 10px; display: flex;">⚡</div>
@@ -29,10 +59,10 @@
                 <button onclick="document.getElementById('sb-full-dashboard').remove()" style="background: #ef4444; color: #fff; border: none; padding: 10px 20px; border-radius: 10px; font-weight: 600; cursor: pointer; transition: 0.2s;">✕ Tutup Dashboard</button>
             </div>
 
-            <!-- DASHBOARD CARDS GRID (3 UTAMA) -->
+            <!-- DASHBOARD CARDS GRID -->
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; margin-top: 30px;">
                 
-                <!-- CARD 1: SCREENER -->
+                <!-- CARD 1: SCREENER AUTOMATION -->
                 <div class="dash-card">
                     <div class="card-header">
                         <span class="card-icon">📊</span>
@@ -43,11 +73,11 @@
                     </div>
                     <p class="card-desc">Modul penarik data 5 preset Screener Stockbit secara otomatis & dispatch ke GSheets.</p>
                     <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 15px;">
-                        <button class="action-btn" onclick="runPreset('FINAL BPJS')">🔥 FINAL BPJS - ONE DAY TRADE</button>
-                        <button class="action-btn" onclick="runPreset('BD SANGKUT')">⚡ BD SANGKUT</button>
-                        <button class="action-btn" onclick="runPreset('REMORA')">🦈 REMORA</button>
-                        <button class="action-btn" onclick="runPreset('SIDEWAYS 1')">📈 SIDEWAYS 1</button>
-                        <button class="action-btn" onclick="runPreset('SIDEWAYS 2')">📉 SIDEWAYS 2</button>
+                        <button class="action-btn" onclick="runScreenerAutomation('FINAL BPJS - ONE DAY TRADE')">🔥 FINAL BPJS - ONE DAY TRADE</button>
+                        <button class="action-btn" onclick="runScreenerAutomation('BD SANGKUT')">⚡ BD SANGKUT</button>
+                        <button class="action-btn" onclick="runScreenerAutomation('REMORA')">🦈 REMORA</button>
+                        <button class="action-btn" onclick="runScreenerAutomation('SIDEWAYS 1')">📈 SIDEWAYS 1</button>
+                        <button class="action-btn" onclick="runScreenerAutomation('SIDEWAYS 2')">📉 SIDEWAYS 2</button>
                     </div>
                 </div>
 
@@ -63,7 +93,7 @@
                     <p class="card-desc">Automasi pencarian kode saham & scraping akum/distribusi Top Broker.</p>
                     <div style="margin-top: 15px;">
                         <input type="text" id="ba-input" placeholder="Kode Saham (cth: BBCA, BMRI)" class="dash-input">
-                        <button class="action-btn-primary" style="margin-top: 10px; width: 100%;" onclick="startBrokerAnalysis()">🚀 Scrape Broker Analysis</button>
+                        <button class="action-btn-primary" style="margin-top: 10px; width: 100%;" onclick="updateLog('Modul 02 belum diaktifkan', 'warning')">🚀 Scrape Broker Analysis</button>
                     </div>
                 </div>
 
@@ -82,13 +112,13 @@
                         <input type="date" id="act-start" class="dash-input" style="margin-bottom: 8px;">
                         <label style="font-size: 11px; color: #9ca3af;">End Date:</label>
                         <input type="date" id="act-end" class="dash-input">
-                        <button class="action-btn-primary" style="margin-top: 10px; width: 100%; background: #f59e0b;" onclick="startBrokerActivity()">🚀 Fetch Broker Activity</button>
+                        <button class="action-btn-primary" style="margin-top: 10px; width: 100%; background: #f59e0b;" onclick="updateLog('Modul 03 belum diaktifkan', 'warning')">🚀 Fetch Broker Activity</button>
                     </div>
                 </div>
 
             </div>
 
-            <!-- STATUS BAR -->
+            <!-- STATUS LOG -->
             <div id="dash-log" style="margin-top: 25px; background: #111827; border: 1px solid #1f2937; padding: 15px; border-radius: 12px; color: #10b981; font-size: 13px;">
                 System Status: Dashboard Ready.
             </div>
@@ -114,15 +144,82 @@
     `;
     document.head.appendChild(style);
 
-    // HANDLER FUNCTIONS
-    window.runPreset = function(name) {
-        document.getElementById('dash-log').innerText = "Status: Running Screener Automation [" + name + "]...";
+    // 3. LOG HELPER
+    window.updateLog = function(message, type = 'info') {
+        const logEl = document.getElementById('dash-log');
+        if (!logEl) return;
+        
+        let color = '#10b981'; // Green (Success/Info)
+        if (type === 'warning') color = '#f59e0b';
+        if (type === 'error') color = '#ef4444';
+
+        logEl.style.color = color;
+        logEl.innerText = `[${new Date().toLocaleTimeString()}] Status: ${message}`;
     };
-    window.startBrokerAnalysis = function() {
-        const stocks = document.getElementById('ba-input').value;
-        document.getElementById('dash-log').innerText = "Status: Scraping Broker Analysis for: " + stocks;
+
+    // 4. LOGIKA SCRAPING & AUTOMATION SCREENER (MODUL 01)
+    window.runScreenerAutomation = async function(presetName) {
+        const config = SCREENER_CONFIGS[presetName];
+        if (!config) {
+            updateLog(`Konfigurasi untuk preset "${presetName}" tidak ditemukan!`, 'error');
+            return;
+        }
+
+        updateLog(`Mulai proses scraping untuk preset: ${presetName}...`, 'info');
+
+        // Buka temporary overlay agar user bisa melihat animasi tabel dibaca
+        document.getElementById('sb-full-dashboard').style.display = 'none';
+
+        try {
+            // A. Ambil tabel dari DOM Stockbit Screener
+            const tableContainer = document.querySelector('.ant-table-content table') || document.querySelector('table');
+            if (!tableContainer) {
+                document.getElementById('sb-full-dashboard').style.display = 'block';
+                updateLog("Tabel Stockbit tidak ditemukan pada halaman ini. Pastikan lu sedang di menu Screener!", 'error');
+                return;
+            }
+
+            // B. Scraping Headers & Rows Data
+            const rows = Array.from(tableContainer.querySelectorAll('tr'));
+            if (rows.length === 0) {
+                document.getElementById('sb-full-dashboard').style.display = 'block';
+                updateLog("Tabel screener kosong / data belum di-load oleh Stockbit.", 'warning');
+                return;
+            }
+
+            const scrapedData = [];
+            rows.forEach((row) => {
+                const cells = Array.from(row.querySelectorAll('th, td')).map(c => c.innerText.trim());
+                if (cells.length > 0) {
+                    scrapedData.push(cells);
+                }
+            });
+
+            // Tampilkan kembali overlay
+            document.getElementById('sb-full-dashboard').style.display = 'block';
+            updateLog(`Data berhasil di-scrape (${scrapedData.length} baris). Mengirim ke Google Sheets...`, 'info');
+
+            // C. Dispatch Data ke Google Apps Script (GAS)
+            const payload = {
+                presetName: presetName,
+                sheetName: config.sheet,
+                startColumn: config.startCol,
+                data: scrapedData
+            };
+
+            const response = await fetch(config.gasUrl, {
+                method: 'POST',
+                mode: 'no-cors', // Mencegah terblokir CORS pada Webhook GAS
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            updateLog(`✅ Berhasil! Data preset [${presetName}] telah dikirim ke Sheet: ${config.sheet} (Kolom ${config.startCol}).`, 'info');
+
+        } catch (err) {
+            document.getElementById('sb-full-dashboard').style.display = 'block';
+            updateLog(`❌ Gagal mengeksekusi automation: ${err.message}`, 'error');
+        }
     };
-    window.startBrokerActivity = function() {
-        document.getElementById('dash-log').innerText = "Status: Fetching Broker Activity...";
-    };
+
 })();
