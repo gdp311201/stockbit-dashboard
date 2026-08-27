@@ -1,5 +1,5 @@
 (function() {
-    // 1. MAPPING KONFIGURASI SCREENER (DISESUAIKAN DENGAN SCRIPT LAMA)
+    // 1. MAPPING KONFIGURASI SCREENER
     const SCREENER_CONFIGS = {
         "FINAL BPJS - ONE DAY TRADE": {
             targetKeywords: ["FINAL BPJS - ONE DAY TRADE", "FINAL BPJS", "ONE DAY TRADE"],
@@ -46,7 +46,6 @@
         return;
     }
 
-    // Helper Format Tanggal (Sesuai Script Scraper Lama: 27 Aug 26)
     const formatDateStr = (isoDate) => {
         const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         const d = new Date(isoDate);
@@ -55,134 +54,194 @@
 
     const todayIso = new Date().toISOString().split('T')[0];
 
-    // 2. BUILD OVERLAY & MODAL CONTAINER
+    // 2. OVERLAY UTAMA (BACKDROP BLUR & SEMI-TRANSPARENT)
     const overlay = document.createElement('div');
     overlay.id = 'sb-full-dashboard';
     
     overlay.style = `
         position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-        background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
-        z-index: 999999; color: #e2e8f0; font-family: 'Inter', system-ui, sans-serif;
+        background: rgba(2, 6, 13, 0.45); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+        z-index: 999999; color: #e2e8f0; font-family: 'Inter', system-ui, -apple-system, sans-serif;
         display: flex; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box;
     `;
 
     overlay.innerHTML = `
-        <div style="width: 100%; max-width: 820px; max-height: 90vh; background: #0f172a; border: 1px solid #1e293b; border-radius: 16px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);">
+        <div style="width: 100%; max-width: 860px; max-height: 94vh; display: flex; flex-direction: column; gap: 16px; overflow-y: auto; padding-right: 4px;">
             
-            <!-- HEADER MODAL -->
-            <div style="background: #020617; border-bottom: 1px solid #1e293b; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center;">
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <div style="background: #059669; padding: 6px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">⚡</div>
-                    <div>
-                        <h1 style="margin: 0; font-size: 16px; font-weight: 700; color: #fff;">STOCKBIT TOOLS <span style="font-size: 11px; font-weight: normal; color: #10b981; background: rgba(16,185,129,0.15); padding: 2px 6px; border-radius: 12px; margin-left: 6px;">v6.0 Integrated Gas</span></h1>
+            <!-- 1. FLOATING HEADER BUBBLE -->
+            <div class="floating-bubble-card" style="padding: 14px 20px; display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); width: 38px; height: 38px; border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 15px rgba(16, 185, 129, 0.15);">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                        </svg>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <h1 style="margin: 0; font-size: 16px; font-weight: 800; color: #fff; letter-spacing: 0.5px;">STOCKBIT<span style="color: #10b981;">TOOLS</span></h1>
+                        <span style="font-size: 11px; font-weight: 600; color: #38bdf8; background: rgba(56, 189, 248, 0.12); border: 1px solid rgba(56, 189, 248, 0.25); padding: 3px 12px; border-radius: 20px; letter-spacing: 0.3px;">by Julyo Sechar</span>
                     </div>
                 </div>
-                <button onclick="document.getElementById('sb-full-dashboard').remove()" style="background: #1e293b; color: #94a3b8; border: 1px solid #334155; width: 32px; height: 32px; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#94a3b8'">✕</button>
+                <button onclick="document.getElementById('sb-full-dashboard').remove()" style="background: rgba(239, 68, 68, 0.12); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); padding: 6px 16px; border-radius: 20px; font-weight: 700; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.2s;" onmouseover="this.style.background='rgba(239, 68, 68, 0.25)';" onmouseout="this.style.background='rgba(239, 68, 68, 0.12)';">
+                    ⏻ Keluar
+                </button>
             </div>
 
-            <!-- BODY CONTENT -->
-            <div style="padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px;">
+            <!-- 2. FLOATING CARDS GRID -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px;">
                 
-                <!-- CARDS GRID -->
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 15px;">
-                    
-                    <!-- CARD 1: SCREENER AUTOMATION -->
-                    <div class="dash-card">
-                        <div class="card-header">
-                            <span class="card-title">SCREENER AUTOMATION</span>
-                            <span class="card-badge">01</span>
-                        </div>
-                        <p class="card-desc">Pilih preset screener untuk memuat data secara otomatis.</p>
-                        <div style="display: flex; flex-direction: column; gap: 6px; margin-top: 10px;">
-                            <button class="action-btn" onclick="runScreenerAutomation('FINAL BPJS - ONE DAY TRADE')">🔥 FINAL BPJS</button>
-                            <button class="action-btn" onclick="runScreenerAutomation('BD SANGKUT')">⚡ BD SANGKUT</button>
-                            <button class="action-btn" onclick="runScreenerAutomation('REMORA')">🦈 REMORA</button>
-                            <button class="action-btn" onclick="runScreenerAutomation('SIDEWAYS 1')">📈 SIDEWAYS 1</button>
-                            <button class="action-btn" onclick="runScreenerAutomation('SIDEWAYS 2')">📉 SIDEWAYS 2</button>
-                        </div>
+                <!-- CARD 1: SCREENER AUTOMATION -->
+                <div class="floating-bubble-card" style="padding: 18px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size: 12px; font-weight: 800; color: #f1f5f9; letter-spacing: 0.5px;">SCREENER AUTOMATION</span>
+                        <span style="font-size: 10px; color: #38bdf8; background: rgba(56, 189, 248, 0.12); padding: 2px 8px; border-radius: 12px; font-weight: 700;">01</span>
                     </div>
-
-                    <!-- CARD 2: BROKER ANALYSIS -->
-                    <div class="dash-card">
-                        <div class="card-header">
-                            <span class="card-title">BROKER ANALYSIS</span>
-                            <span class="card-badge">02</span>
-                        </div>
-                        <p class="card-desc">Automasi pencarian kode saham & akum/distribusi Top Broker.</p>
-                        <div style="margin-top: 10px; display: flex; flex-direction: column; gap: 8px;">
-                            <input type="text" placeholder="Kode Saham (cth: BBCA)" class="dash-input">
-                            <button class="action-btn-primary" onclick="updateLog('Modul 02 belum diaktifkan', 'warning')">🚀 Scrape Analysis</button>
-                        </div>
+                    <p style="font-size: 11px; color: #94a3b8; margin: 8px 0 12px 0; line-height: 1.4;">Pilih preset screener untuk memuat data secara otomatis.</p>
+                    <div style="display: flex; flex-direction: column; gap: 7px;">
+                        <button class="action-btn" onclick="runScreenerAutomation('FINAL BPJS - ONE DAY TRADE')">🔥 FINAL BPJS</button>
+                        <button class="action-btn" onclick="runScreenerAutomation('BD SANGKUT')">⚡ BD SANGKUT</button>
+                        <button class="action-btn" onclick="runScreenerAutomation('REMORA')">🦈 REMORA</button>
+                        <button class="action-btn" onclick="runScreenerAutomation('SIDEWAYS 1')">📈 SIDEWAYS 1</button>
+                        <button class="action-btn" onclick="runScreenerAutomation('SIDEWAYS 2')">📉 SIDEWAYS 2</button>
                     </div>
-
-                    <!-- CARD 3: BROKER ACTIVITY -->
-                    <div class="dash-card">
-                        <div class="card-header">
-                            <span class="card-title">BROKER ACTIVITY</span>
-                            <span class="card-badge">03</span>
-                        </div>
-                        <p class="card-desc">Fetch data transaksi broker berdasarkan Date Range.</p>
-                        <div style="margin-top: 10px; display: flex; flex-direction: column; gap: 6px;">
-                            <input type="date" class="dash-input">
-                            <input type="date" class="dash-input">
-                            <button class="action-btn-primary" style="background: #f59e0b;" onclick="updateLog('Modul 03 belum diaktifkan', 'warning')">🚀 Fetch Activity</button>
-                        </div>
-                    </div>
-
                 </div>
 
-                <!-- STATUS LOG -->
-                <div id="dash-log" style="background: #020617; border: 1px solid #1e293b; padding: 12px 15px; border-radius: 10px; color: #10b981; font-size: 12px; font-family: monospace;">
-                    Status: Siap dijalankan.
+                <!-- CARD 2: BROKER ANALYSIS -->
+                <div class="floating-bubble-card" style="padding: 18px; display: flex; flex-direction: column; justify-content: space-between;">
+                    <div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-size: 12px; font-weight: 800; color: #f1f5f9; letter-spacing: 0.5px;">BROKER ANALYSIS</span>
+                            <span style="font-size: 10px; color: #38bdf8; background: rgba(56, 189, 248, 0.12); padding: 2px 8px; border-radius: 12px; font-weight: 700;">02</span>
+                        </div>
+                        <p style="font-size: 11px; color: #94a3b8; margin: 8px 0 12px 0; line-height: 1.4;">Automasi pencarian kode saham & akum/distribusi Top Broker.</p>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <input type="text" placeholder="Kode Saham (cth: BBCA)" class="dash-input">
+                        <button class="action-btn-primary" onclick="updateLog('Modul 02 belum diaktifkan', 'warning')">🚀 Scrape Analysis</button>
+                    </div>
                 </div>
 
-                <!-- PREVIEW TABLE CONTAINER -->
-                <div id="preview-container" style="background: #020617; border: 1px solid #1e293b; border-radius: 12px; padding: 15px; display: none;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid #1e293b; padding-bottom: 8px; flex-wrap: wrap; gap: 10px;">
-                        <div>
-                            <h3 id="preview-title" style="margin: 0; color: #fff; font-size: 14px;">Hasil Screener</h3>
-                            <span id="preview-count" style="font-size: 11px; color: #64748b;">0 Data Ditemukan</span>
+                <!-- CARD 3: BROKER ACTIVITY -->
+                <div class="floating-bubble-card" style="padding: 18px; display: flex; flex-direction: column; justify-content: space-between;">
+                    <div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-size: 12px; font-weight: 800; color: #f1f5f9; letter-spacing: 0.5px;">BROKER ACTIVITY</span>
+                            <span style="font-size: 10px; color: #38bdf8; background: rgba(56, 189, 248, 0.12); padding: 2px 8px; border-radius: 12px; font-weight: 700;">03</span>
                         </div>
-
-                        <!-- DATE SELECTOR & EXPORT BUTTON -->
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <div style="display: flex; align-items: center; gap: 5px;">
-                                <label style="font-size: 11px; color: #94a3b8; font-weight: 600;">Tanggal:</label>
-                                <input type="date" id="export-date" value="${todayIso}" class="dash-input" style="padding: 4px 8px; width: auto;">
-                            </div>
-                            <button id="btn-export" onclick="exportDataToGAS()" style="background: #10b981; color: #fff; border: none; padding: 7px 16px; border-radius: 6px; font-weight: 700; font-size: 12px; cursor: pointer;">
-                                EXPORT TO GSHEETS
-                            </button>
-                        </div>
+                        <p style="font-size: 11px; color: #94a3b8; margin: 8px 0 12px 0; line-height: 1.4;">Fetch data transaksi broker berdasarkan Date Range.</p>
                     </div>
-
-                    <div style="overflow-x: auto; max-height: 250px; overflow-y: auto;">
-                        <table id="preview-table" style="width: 100%; border-collapse: collapse; font-size: 12px; text-align: left; color: #cbd5e1;">
-                            <thead id="preview-thead" style="position: sticky; top: 0; background: #1e293b; color: #10b981;"></thead>
-                            <tbody id="preview-tbody"></tbody>
-                        </table>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <input type="date" class="dash-input">
+                        <input type="date" class="dash-input">
+                        <button class="action-btn-primary" style="background: linear-gradient(135deg, #f59e0b, #d97706);" onclick="updateLog('Modul 03 belum diaktifkan', 'warning')">🚀 Fetch Activity</button>
                     </div>
                 </div>
 
             </div>
+
+            <!-- 3. FLOATING STATUS LOG BUBBLE -->
+            <div id="dash-log" class="floating-bubble-card" style="padding: 12px 18px; color: #10b981; font-size: 12px; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.2px;">
+                Status: Siap dijalankan.
+            </div>
+
+            <!-- 4. FLOATING PREVIEW TABLE BUBBLE -->
+            <div id="preview-container" class="floating-bubble-card" style="padding: 18px; display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); flex-wrap: wrap; gap: 10px;">
+                    <div>
+                        <h3 id="preview-title" style="margin: 0; color: #fff; font-size: 14px; font-weight: 700;">Hasil Screener</h3>
+                        <span id="preview-count" style="font-size: 11px; color: #94a3b8;">0 Data Ditemukan</span>
+                    </div>
+
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <label style="font-size: 11px; color: #94a3b8; font-weight: 600;">Tanggal:</label>
+                            <input type="date" id="export-date" value="${todayIso}" class="dash-input" style="padding: 5px 10px; width: auto;">
+                        </div>
+                        <button id="btn-export" onclick="exportDataToGAS()" style="background: linear-gradient(135deg, #10b981, #059669); color: #fff; border: none; padding: 8px 18px; border-radius: 20px; font-weight: 700; font-size: 12px; cursor: pointer; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2); transition: all 0.2s;">
+                            EXPORT TO GSHEETS
+                        </button>
+                    </div>
+                </div>
+
+                <div style="overflow-x: auto; max-height: 250px; overflow-y: auto;">
+                    <table id="preview-table" style="width: 100%; border-collapse: collapse; font-size: 12px; text-align: left; color: #cbd5e1;">
+                        <thead id="preview-thead" style="position: sticky; top: 0; background: rgba(15, 23, 42, 0.95); color: #10b981;"></thead>
+                        <tbody id="preview-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+
         </div>
     `;
 
     document.body.appendChild(overlay);
 
+    // CSS STYLING DENGAN KARTU SEMI-TRANSPARAN (GLASSMORPHISM LAMPIRAN 2)
     const style = document.createElement('style');
     style.innerHTML = `
-        .dash-card { background: #020617; border: 1px solid #1e293b; border-radius: 12px; padding: 14px; display: flex; flex-direction: column; justify-content: space-between; }
-        .card-header { display: flex; justify-content: space-between; align-items: center; }
-        .card-title { margin: 0; font-size: 12px; font-weight: 700; color: #f1f5f9; }
-        .card-badge { font-size: 10px; color: #38bdf8; background: rgba(56,189,248,0.1); padding: 1px 6px; border-radius: 8px; font-weight: bold; }
-        .card-desc { font-size: 11px; color: #64748b; margin-top: 6px; line-height: 1.3; }
-        .dash-input { width: 100%; padding: 8px; background: #0f172a; border: 1px solid #334155; border-radius: 6px; color: #fff; font-size: 12px; box-sizing: border-box; }
-        .action-btn { width: 100%; padding: 8px; background: #0f172a; border: 1px solid #334155; color: #cbd5e1; border-radius: 6px; text-align: left; cursor: pointer; font-size: 11px; font-weight: 600; }
-        .action-btn:hover { background: #1e293b; border-color: #38bdf8; color: #fff; }
-        .action-btn-primary { width: 100%; padding: 8px; background: #10b981; color: #fff; border: none; border-radius: 6px; font-weight: bold; font-size: 11px; cursor: pointer; }
-        #preview-table td, #preview-table th { padding: 8px 10px; border-bottom: 1px solid #1e293b; white-space: nowrap; }
-        #preview-table tbody tr:hover { background: rgba(255,255,255,0.03); }
+        .floating-bubble-card {
+            background: rgba(10, 16, 28, 0.55);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-radius: 18px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+            transition: all 0.2s ease;
+        }
+        
+        .dash-input { 
+            width: 100%; 
+            padding: 9px 12px; 
+            background: rgba(5, 10, 20, 0.5); 
+            border: 1px solid rgba(255, 255, 255, 0.08); 
+            border-radius: 10px; 
+            color: #fff; 
+            font-size: 12px; 
+            box-sizing: border-box; 
+            outline: none;
+            transition: border 0.2s;
+        }
+        .dash-input:focus { border-color: rgba(16, 185, 129, 0.5); }
+        
+        .action-btn { 
+            width: 100%; 
+            padding: 9px 12px; 
+            background: rgba(255, 255, 255, 0.03); 
+            border: 1px solid rgba(255, 255, 255, 0.06); 
+            color: #cbd5e1; 
+            border-radius: 10px; 
+            text-align: left; 
+            cursor: pointer; 
+            font-size: 11px; 
+            font-weight: 600; 
+            transition: all 0.2s;
+        }
+        .action-btn:hover { 
+            background: rgba(16, 185, 129, 0.15); 
+            border-color: rgba(16, 185, 129, 0.35); 
+            color: #fff; 
+            transform: translateY(-1px);
+        }
+        
+        .action-btn-primary { 
+            width: 100%; 
+            padding: 10px; 
+            background: linear-gradient(135deg, #10b981, #059669); 
+            color: #fff; 
+            border: none; 
+            border-radius: 10px; 
+            font-weight: 700; 
+            font-size: 11px; 
+            cursor: pointer; 
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+            transition: all 0.2s;
+        }
+        .action-btn-primary:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        #preview-table td, #preview-table th { padding: 9px 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); white-space: nowrap; }
+        #preview-table tbody tr:hover { background: rgba(255, 255, 255, 0.03); }
         .dash-input::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
     `;
     document.head.appendChild(style);
@@ -215,7 +274,6 @@
             const initialFirstRowText = document.querySelector('tbody.ant-table-tbody tr')?.innerText || '';
             let targetClicked = false;
 
-            // CARI DI TAB HORIZONTAL DULU
             const allElements = Array.from(document.querySelectorAll('button, div, span, a, li'));
             for (let el of allElements) {
                 if (el.closest('#sb-full-dashboard')) continue;
@@ -231,7 +289,6 @@
                 }
             }
 
-            // JIKA TIDAK ADA DI TAB, BUKA FAVORITES
             if (!targetClicked) {
                 const favoritesBtn = Array.from(document.querySelectorAll('div, button, span')).find(el => {
                     if (el.closest('#sb-full-dashboard')) return false;
@@ -261,7 +318,6 @@
                 return;
             }
 
-            // WAITING LOOP
             updateLog(`Memuat data [${btnKey}]... Harap tunggu.`);
             let checkRetry = 0;
 
@@ -277,7 +333,6 @@
 
             await sleep(1000);
 
-            // SCRAPE TABEL HASIL
             const table = document.querySelector('table');
             const tbody = document.querySelector('tbody.ant-table-tbody') || (table ? table.querySelector('tbody') : null);
             const thead = document.querySelector('thead.ant-table-thead') || (table ? table.querySelector('thead') : null);
@@ -359,7 +414,7 @@
         container.scrollIntoView({ behavior: 'smooth' });
     }
 
-    // 5. EXPORT KE GSHEETS (DENGAN STRUKTUR DARI SCRIPT SCRAPER LAMA)
+    // 5. EXPORT KE GSHEETS
     window.exportDataToGAS = async function() {
         const btnExport = document.getElementById('btn-export');
         const dateInput = document.getElementById('export-date').value;
@@ -387,12 +442,10 @@
             btnExport.disabled = true;
 
             const dateStr = formatDateStr(dateInput);
-            // Tambahkan kolom tanggal di paling depan tiap baris data (persis script lama)
             const finalRows = rawRows.map(row => [dateStr, ...row]);
 
             updateLog(`Mengirim ${finalRows.length} baris ke Sheet '${cfg.sheet}' Kolom ${cfg.startCol}...`);
 
-            // Payload disesuaikan persis dengan script lama kamu
             const payload = {
                 spreadsheetId: cfg.id,
                 sheetName: cfg.sheet,
