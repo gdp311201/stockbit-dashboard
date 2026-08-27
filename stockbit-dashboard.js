@@ -41,26 +41,26 @@
         return;
     }
 
-    // 2. BUILD OVERLAY UI
+    // 2. BUILD OVERLAY UI (BACKGROUND TRANSPARAN + BLUR)
     const overlay = document.createElement('div');
     overlay.id = 'sb-full-dashboard';
     overlay.style = `
         position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-        background: rgba(10, 14, 23, 0.95); backdrop-filter: blur(10px);
+        background: rgba(10, 14, 23, 0.45); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
         z-index: 999999; color: #e2e8f0; font-family: 'Inter', system-ui, sans-serif;
         overflow-y: auto; padding: 40px 20px; box-sizing: border-box;
-        transition: opacity 0.3s ease;
+        transition: opacity 0.3s ease; pointer-events: none;
     `;
 
     overlay.innerHTML = `
-        <div style="max-width: 1100px; margin: 0 auto;">
+        <div style="max-width: 1100px; margin: 0 auto; pointer-events: auto;">
             
             <!-- HEADER -->
-            <div style="background: #111827; border: 1px solid #1f2937; border-radius: 16px; padding: 24px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+            <div style="background: rgba(17, 24, 39, 0.85); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 24px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
                 <div>
                     <div style="display: flex; align-items: center; gap: 12px;">
                         <div style="background: #059669; padding: 8px; border-radius: 10px; display: flex;">⚡</div>
-                        <h1 style="margin: 0; font-size: 22px; font-weight: 700; color: #fff;">STOCKBIT TOOLS <span style="font-size: 12px; font-weight: normal; color: #10b981; background: rgba(16,185,129,0.1); padding: 4px 8px; border-radius: 20px;">v4.0 React-Dispatch</span></h1>
+                        <h1 style="margin: 0; font-size: 22px; font-weight: 700; color: #fff;">STOCKBIT TOOLS <span style="font-size: 12px; font-weight: normal; color: #10b981; background: rgba(16,185,129,0.2); padding: 4px 8px; border-radius: 20px;">v4.2 Transparent UI</span></h1>
                     </div>
                     <p style="margin: 8px 0 0 0; color: #9ca3af; font-size: 13px;">Stockbit Scraper & Automation Management Dashboard Overlay</p>
                 </div>
@@ -125,13 +125,13 @@
             </div>
 
             <!-- STATUS LOG -->
-            <div id="dash-log" style="margin-top: 25px; background: #111827; border: 1px solid #1f2937; padding: 15px; border-radius: 12px; color: #10b981; font-size: 13px; font-family: monospace;">
-                Status: System Ready.
+            <div id="dash-log" style="margin-top: 25px; background: rgba(17, 24, 39, 0.85); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); padding: 15px; border-radius: 12px; color: #10b981; font-size: 13px; font-family: monospace;">
+                Status: System Ready. Dashboard transparan aktif.
             </div>
 
             <!-- AREA PREVIEW TABEL & ACTION BUTTONS -->
-            <div id="preview-container" style="margin-top: 20px; background: #111827; border: 1px solid #1f2937; border-radius: 16px; padding: 20px; display: none;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #1f2937; padding-bottom: 12px;">
+            <div id="preview-container" style="margin-top: 20px; background: rgba(17, 24, 39, 0.9); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 20px; display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 12px;">
                     <div>
                         <h3 id="preview-title" style="margin: 0; color: #fff; font-size: 16px;">Hasil Screener</h3>
                         <span id="preview-count" style="font-size: 12px; color: #9ca3af;">0 Data Ditemukan</span>
@@ -156,21 +156,21 @@
 
     document.body.appendChild(overlay);
 
-    // CSS STYLES
+    // STYLES SEMI-TRANSPARAN
     const style = document.createElement('style');
     style.innerHTML = `
-        .dash-card { background: #111827; border: 1px solid #1f2937; border-radius: 16px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; }
+        .dash-card { background: rgba(17, 24, 39, 0.85); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; }
         .card-header { display: flex; justify-content: space-between; align-items: center; }
-        .card-icon { font-size: 24px; background: #1f2937; padding: 8px; border-radius: 10px; }
+        .card-icon { font-size: 24px; background: rgba(31, 41, 55, 0.8); padding: 8px; border-radius: 10px; }
         .card-title { margin: 0; font-size: 15px; font-weight: 700; color: #f3f4f6; }
-        .card-badge { font-size: 11px; color: #3b82f6; background: rgba(59,130,246,0.1); padding: 2px 8px; border-radius: 10px; font-weight: bold; }
+        .card-badge { font-size: 11px; color: #3b82f6; background: rgba(59,130,246,0.2); padding: 2px 8px; border-radius: 10px; font-weight: bold; }
         .card-desc { font-size: 12px; color: #9ca3af; margin-top: 10px; line-height: 1.4; }
-        .dash-input { width: 100%; padding: 10px; background: #1f2937; border: 1px solid #374151; border-radius: 8px; color: #fff; box-sizing: border-box; }
-        .action-btn { width: 100%; padding: 10px; background: #1f2937; border: 1px solid #374151; color: #e5e7eb; border-radius: 8px; text-align: left; cursor: pointer; font-size: 12px; font-weight: 600; }
-        .action-btn:hover { background: #374151; border-color: #3b82f6; color: #fff; }
+        .dash-input { width: 100%; padding: 10px; background: rgba(31, 41, 55, 0.8); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #fff; box-sizing: border-box; }
+        .action-btn { width: 100%; padding: 10px; background: rgba(31, 41, 55, 0.8); border: 1px solid rgba(255,255,255,0.1); color: #e5e7eb; border-radius: 8px; text-align: left; cursor: pointer; font-size: 12px; font-weight: 600; }
+        .action-btn:hover { background: rgba(55, 65, 81, 0.9); border-color: #3b82f6; color: #fff; }
         .action-btn-primary { width: 100%; padding: 10px; background: #10b981; color: #fff; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        #preview-table td, #preview-table th { padding: 10px 12px; border-bottom: 1px solid #1f2937; white-space: nowrap; }
-        #preview-table tbody tr:hover { background: rgba(255,255,255,0.03); }
+        #preview-table td, #preview-table th { padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.08); white-space: nowrap; }
+        #preview-table tbody tr:hover { background: rgba(255,255,255,0.05); }
     `;
     document.head.appendChild(style);
 
@@ -184,7 +184,6 @@
 
     const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-    // SIMULASI KLIK KHUSUS REACT DOM
     function triggerReactClick(element) {
         if (!element) return;
         const opts = { bubbles: true, cancelable: true, view: window };
@@ -193,18 +192,15 @@
         element.dispatchEvent(new MouseEvent('click', opts));
     }
 
-    // 3. LOGIKA EXECUTOR AUTOMATED SCREENER
+    // 3. AUTOMATED SCREENER EXECUTOR
     window.runScreenerAutomation = async function(btnKey) {
         const cfg = SCREENER_CONFIGS[btnKey];
         if (!cfg) return;
 
-        const dashEl = document.getElementById('sb-full-dashboard');
-
         try {
             updateLog(`Running Screener Automation [${btnKey}]...`);
-            if (dashEl) dashEl.style.display = 'none';
 
-            // STEP A: CARI TOMBOL DROPDOWN FAVORITES/PRESET STOCKBIT
+            // STEP A: CARI DROPDOWN PRESET / FAVORITES STOCKBIT
             let dropdown = Array.from(document.querySelectorAll('*')).find(el => {
                 const text = el.innerText ? el.innerText.trim() : '';
                 return (text === 'Favorites' || text.includes('My Preset')) && el.children.length === 0;
@@ -220,12 +216,11 @@
                 triggerReactClick(dropdown.parentElement || dropdown);
                 await sleep(800);
             } else {
-                if (dashEl) dashEl.style.display = 'block';
                 updateLog(`Gagal: Menu dropdown Preset/Favorites tidak ditemukan di Stockbit.`, 'error');
                 return;
             }
 
-            // STEP B: MENCARI DAN MEMILIH ITEM POPUP BERDASARKAN KEYWORDS
+            // STEP B: MENCARI DAN MEMILIH ITEM PRESET
             let items = Array.from(document.querySelectorAll('.ant-dropdown-menu-item, .ant-popover-inner-content div, .ant-select-item-option'));
             let targetItem = null;
 
@@ -239,20 +234,18 @@
 
             if (targetItem) {
                 triggerReactClick(targetItem);
-                await sleep(2500); // Waktu muat tabel Stockbit
+                await sleep(2500);
             } else {
-                if (dashEl) dashEl.style.display = 'block';
                 updateLog(`Gagal: Preset "${btnKey}" tidak ditemukan di daftar dropdown Stockbit.`, 'error');
                 return;
             }
 
-            // STEP C: EXTRACTION DATA TABEL
+            // STEP C: SCRAPE DATA TABEL HASIL
             const table = document.querySelector('table');
             const tbody = document.querySelector('tbody.ant-table-tbody') || (table ? table.querySelector('tbody') : null);
             const thead = document.querySelector('thead.ant-table-thead') || (table ? table.querySelector('thead') : null);
 
             if (!tbody) {
-                if (dashEl) dashEl.style.display = 'block';
                 updateLog(`Gagal: Tabel hasil screener tidak ditemukan.`, 'error');
                 return;
             }
@@ -276,8 +269,6 @@
                 }
             });
 
-            if (dashEl) dashEl.style.display = 'block';
-
             if (scrapedData.length === 0) {
                 updateLog(`Data screener kosong / tidak ada saham yang lolos kriteria.`, 'warning');
                 return;
@@ -290,12 +281,11 @@
             updateLog(`Selesai! Berhasil mengambil ${scrapedData.length} baris data [${btnKey}].`, 'info');
 
         } catch (err) {
-            if (dashEl) dashEl.style.display = 'block';
             updateLog(`Error Executing: ${err.message}`, 'error');
         }
     };
 
-    // 4. RENDER PREVIEW TABEL DARI STOCKBIT KE DASHBOARD
+    // 4. RENDER PREVIEW TABEL
     function renderPreviewTable(presetKey, headers, rows) {
         const container = document.getElementById('preview-container');
         const title = document.getElementById('preview-title');
@@ -332,7 +322,7 @@
         container.scrollIntoView({ behavior: 'smooth' });
     }
 
-    // 5. DISPATCH DATA KE GOOGLE SHEETS VIA GAS
+    // 5. EXPORT KE GSHEETS
     window.exportDataToGAS = async function() {
         const btnExport = document.getElementById('btn-export');
         const data = window.currentScrapedData;
