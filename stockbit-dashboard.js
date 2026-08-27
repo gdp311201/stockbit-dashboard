@@ -2,31 +2,31 @@
     // 1. MAPPING KONFIGURASI SCREENER & DELEGASI GAS
     const SCREENER_CONFIGS = {
         "FINAL BPJS - ONE DAY TRADE": {
-            targetName: "FINAL BPJS - ONE DAY TR...",
+            targetKeywords: ["FINAL BPJS", "ONE DAY TRADE", "BPJS"],
             sheet: "SC",
             startCol: "T",
             gasUrl: "https://script.google.com/macros/s/AKfycbz_GANTI_DENGAN_URL_GAS_LU/exec"
         },
         "BD SANGKUT": {
-            targetName: "BD - SANGKUT & AKUM",
+            targetKeywords: ["BD - SANGKUT", "BD SANGKUT", "SANGKUT"],
             sheet: "SC",
             startCol: "AA",
             gasUrl: "https://script.google.com/macros/s/AKfycbz_GANTI_DENGAN_URL_GAS_LU/exec"
         },
         "REMORA": {
-            targetName: "REMORA - SIAP NAIK CEPAT",
+            targetKeywords: ["REMORA", "SIAP NAIK"],
             sheet: "SC",
             startCol: "AH",
             gasUrl: "https://script.google.com/macros/s/AKfycbz_GANTI_DENGAN_URL_GAS_LU/exec"
         },
         "SIDEWAYS 1": {
-            targetName: "SIDEWAYS SCREENER V1",
+            targetKeywords: ["SIDEWAYS SCREENER V1", "SIDEWAYS 1", "SIDEWAYS V1"],
             sheet: "SC",
             startCol: "AO",
             gasUrl: "https://script.google.com/macros/s/AKfycbz_GANTI_DENGAN_URL_GAS_LU/exec"
         },
         "SIDEWAYS 2": {
-            targetName: "SIDEWAYS SCREENER V2",
+            targetKeywords: ["SIDEWAYS SCREENER V2", "SIDEWAYS 2", "SIDEWAYS V2"],
             sheet: "SC",
             startCol: "AV",
             gasUrl: "https://script.google.com/macros/s/AKfycbz_GANTI_DENGAN_URL_GAS_LU/exec"
@@ -60,7 +60,7 @@
                 <div>
                     <div style="display: flex; align-items: center; gap: 12px;">
                         <div style="background: #059669; padding: 8px; border-radius: 10px; display: flex;">⚡</div>
-                        <h1 style="margin: 0; font-size: 22px; font-weight: 700; color: #fff;">STOCKBIT TOOLS <span style="font-size: 12px; font-weight: normal; color: #10b981; background: rgba(16,185,129,0.1); padding: 4px 8px; border-radius: 20px;">v3.3 Safe-Click</span></h1>
+                        <h1 style="margin: 0; font-size: 22px; font-weight: 700; color: #fff;">STOCKBIT TOOLS <span style="font-size: 12px; font-weight: normal; color: #10b981; background: rgba(16,185,129,0.1); padding: 4px 8px; border-radius: 20px;">v4.0 React-Dispatch</span></h1>
                     </div>
                     <p style="margin: 8px 0 0 0; color: #9ca3af; font-size: 13px;">Stockbit Scraper & Automation Management Dashboard Overlay</p>
                 </div>
@@ -79,7 +79,7 @@
                             <span class="card-badge">01</span>
                         </div>
                     </div>
-                    <p class="card-desc">Pilih preset screener untuk mengambil data dan menampilkannya pada tabel preview di bawah.</p>
+                    <p class="card-desc">Modul penarik data 5 preset Screener Stockbit secara otomatis & dispatch ke GSheets.</p>
                     <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 15px;">
                         <button class="action-btn" onclick="runScreenerAutomation('FINAL BPJS - ONE DAY TRADE')">🔥 FINAL BPJS - ONE DAY TRADE</button>
                         <button class="action-btn" onclick="runScreenerAutomation('BD SANGKUT')">⚡ BD SANGKUT</button>
@@ -126,7 +126,7 @@
 
             <!-- STATUS LOG -->
             <div id="dash-log" style="margin-top: 25px; background: #111827; border: 1px solid #1f2937; padding: 15px; border-radius: 12px; color: #10b981; font-size: 13px; font-family: monospace;">
-                System Status: Dashboard Ready. Pilih preset screener.
+                Status: System Ready.
             </div>
 
             <!-- AREA PREVIEW TABEL & ACTION BUTTONS -->
@@ -137,16 +137,12 @@
                         <span id="preview-count" style="font-size: 12px; color: #9ca3af;">0 Data Ditemukan</span>
                     </div>
                     <div style="display: flex; gap: 10px; align-items: center;">
-                        <div style="background: rgba(16,185,129,0.15); border: 1px solid #10b981; color: #10b981; padding: 6px 14px; border-radius: 8px; font-weight: 600; font-size: 13px; display: flex; align-items: center; gap: 6px;">
-                            <span>✓</span> Google Sheets
-                        </div>
                         <button id="btn-export" onclick="exportDataToGAS()" style="background: #10b981; color: #fff; border: none; padding: 8px 18px; border-radius: 8px; font-weight: 700; cursor: pointer; transition: 0.2s;">
-                            EXPORT
+                            EXPORT TO GSHEETS
                         </button>
                     </div>
                 </div>
 
-                <!-- TABLE AREA -->
                 <div style="overflow-x: auto; max-height: 400px; overflow-y: auto;">
                     <table id="preview-table" style="width: 100%; border-collapse: collapse; font-size: 13px; text-align: left; color: #e2e8f0;">
                         <thead id="preview-thead" style="position: sticky; top: 0; background: #1f2937; color: #10b981;"></thead>
@@ -183,93 +179,107 @@
         if (!log) return;
         const colors = { info: '#10b981', warning: '#f59e0b', error: '#ef4444' };
         log.style.color = colors[type] || '#10b981';
-        log.innerText = `[${new Date().toLocaleTimeString()}] -> ${msg}`;
+        log.innerText = `Status: ${msg}`;
     };
 
     const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-    // 3. LOGIKA AUTOMATED NAVIGATION DENGAN AUTO-HIDE DASHBOARD
+    // SIMULASI KLIK KHUSUS REACT DOM
+    function triggerReactClick(element) {
+        if (!element) return;
+        const opts = { bubbles: true, cancelable: true, view: window };
+        element.dispatchEvent(new MouseEvent('mousedown', opts));
+        element.dispatchEvent(new MouseEvent('mouseup', opts));
+        element.dispatchEvent(new MouseEvent('click', opts));
+    }
+
+    // 3. LOGIKA EXECUTOR AUTOMATED SCREENER
     window.runScreenerAutomation = async function(btnKey) {
         const cfg = SCREENER_CONFIGS[btnKey];
-        if (!cfg) {
-            updateLog(`Konfigurasi "${btnKey}" tidak ditemukan.`, 'error');
-            return;
-        }
-
-        if (!window.location.href.includes('/screener')) {
-            updateLog(`Buka halaman https://stockbit.com/screener terlebih dahulu!`, 'warning');
-            return;
-        }
+        if (!cfg) return;
 
         const dashEl = document.getElementById('sb-full-dashboard');
 
         try {
-            updateLog(`Memulai perpindahan ke screener: "${cfg.targetName}"...`, 'info');
-
-            // SEMBUNYIKAN DASHBOARD AGAR ELEMENT STOCKBIT BISA DIKLIK
+            updateLog(`Running Screener Automation [${btnKey}]...`);
             if (dashEl) dashEl.style.display = 'none';
 
-            // STEP A: KLIK DROPDOWN FAVORITES
-            let favDropdown = Array.from(document.querySelectorAll('p, div, button, span')).find(el => 
-                el.innerText && el.innerText.trim() === 'Favorites'
-            );
+            // STEP A: CARI TOMBOL DROPDOWN FAVORITES/PRESET STOCKBIT
+            let dropdown = Array.from(document.querySelectorAll('*')).find(el => {
+                const text = el.innerText ? el.innerText.trim() : '';
+                return (text === 'Favorites' || text.includes('My Preset')) && el.children.length === 0;
+            });
 
-            if (!favDropdown) {
-                favDropdown = document.querySelector('.icon-toolbar_down') || document.querySelector('button[class*="ant-btn"]');
+            if (!dropdown) {
+                dropdown = document.querySelector('.ant-select-selector') || 
+                           document.querySelector('[class*="screener-dropdown"]') ||
+                           document.querySelector('.ant-dropdown-trigger');
             }
 
-            if (favDropdown) {
-                favDropdown.click();
-                await sleep(600);
+            if (dropdown) {
+                triggerReactClick(dropdown.parentElement || dropdown);
+                await sleep(800);
             } else {
                 if (dashEl) dashEl.style.display = 'block';
-                updateLog(`Tombol 'Favorites' tidak ditemukan di halaman Stockbit.`, 'error');
+                updateLog(`Gagal: Menu dropdown Preset/Favorites tidak ditemukan di Stockbit.`, 'error');
                 return;
             }
 
-            // STEP B: KLIK ITEM MENU
-            const menuItems = Array.from(document.querySelectorAll('.ant-popover-inner-content div, .ant-popover-inner-content p, .ant-dropdown-menu-item'));
-            const targetMenuItem = menuItems.find(el => el.innerText && (el.innerText.trim().toUpperCase().includes(btnKey.toUpperCase()) || el.innerText.trim().includes(cfg.targetName)));
+            // STEP B: MENCARI DAN MEMILIH ITEM POPUP BERDASARKAN KEYWORDS
+            let items = Array.from(document.querySelectorAll('.ant-dropdown-menu-item, .ant-popover-inner-content div, .ant-select-item-option'));
+            let targetItem = null;
 
-            if (targetMenuItem) {
-                targetMenuItem.click();
-                await sleep(2000); // Tunggu Stockbit memuat tabel baru
+            for (let item of items) {
+                const itemText = (item.innerText || '').toUpperCase();
+                if (cfg.targetKeywords.some(kw => itemText.includes(kw.toUpperCase()))) {
+                    targetItem = item;
+                    break;
+                }
+            }
+
+            if (targetItem) {
+                triggerReactClick(targetItem);
+                await sleep(2500); // Waktu muat tabel Stockbit
             } else {
                 if (dashEl) dashEl.style.display = 'block';
-                updateLog(`Pilihan "${cfg.targetName}" tidak ditemukan di daftar Favorites.`, 'error');
+                updateLog(`Gagal: Preset "${btnKey}" tidak ditemukan di daftar dropdown Stockbit.`, 'error');
                 return;
             }
 
-            // STEP C: AMBIL DATA TABEL
-            const tbody = document.querySelector('tbody.ant-table-tbody');
-            const thead = document.querySelector('thead.ant-table-thead');
+            // STEP C: EXTRACTION DATA TABEL
+            const table = document.querySelector('table');
+            const tbody = document.querySelector('tbody.ant-table-tbody') || (table ? table.querySelector('tbody') : null);
+            const thead = document.querySelector('thead.ant-table-thead') || (table ? table.querySelector('thead') : null);
 
             if (!tbody) {
                 if (dashEl) dashEl.style.display = 'block';
-                updateLog(`Tabel screener belum siap atau tidak ditemukan.`, 'error');
+                updateLog(`Gagal: Tabel hasil screener tidak ditemukan.`, 'error');
                 return;
             }
 
             let headers = [];
             if (thead) {
-                headers = Array.from(thead.querySelectorAll('th')).map(th => th.innerText.trim().replace(/\n/g, ' '));
+                headers = Array.from(thead.querySelectorAll('th'))
+                    .map(th => th.innerText.trim().replace(/\n/g, ' '))
+                    .filter(h => h.length > 0);
             }
 
-            const rowElements = Array.from(tbody.querySelectorAll('tr'));
+            const rows = Array.from(tbody.querySelectorAll('tr'));
             const scrapedData = [];
 
-            rowElements.forEach(tr => {
-                const cells = Array.from(tr.querySelectorAll('td')).map(td => td.innerText.trim().replace(/\n/g, ' '));
+            rows.forEach(tr => {
+                const cells = Array.from(tr.querySelectorAll('td'))
+                    .map(td => td.innerText.trim().replace(/\n/g, ' '))
+                    .filter(c => c !== '');
                 if (cells.length > 0) {
                     scrapedData.push(cells);
                 }
             });
 
-            // TAMPILKAN KEMBALI DASHBOARD DENGAN TABEL PREVIEW
             if (dashEl) dashEl.style.display = 'block';
 
             if (scrapedData.length === 0) {
-                updateLog(`Data tabel kosong / belum dimuat oleh Stockbit.`, 'warning');
+                updateLog(`Data screener kosong / tidak ada saham yang lolos kriteria.`, 'warning');
                 return;
             }
 
@@ -277,15 +287,15 @@
             window.currentPresetKey = btnKey;
 
             renderPreviewTable(btnKey, headers, scrapedData);
-            updateLog(`Tabel [${btnKey}] berhasil dipratinjau (${scrapedData.length} baris). Siap Di-export!`, 'info');
+            updateLog(`Selesai! Berhasil mengambil ${scrapedData.length} baris data [${btnKey}].`, 'info');
 
         } catch (err) {
             if (dashEl) dashEl.style.display = 'block';
-            updateLog(`❌ Terjadi Kesalahan: ${err.message}`, 'error');
+            updateLog(`Error Executing: ${err.message}`, 'error');
         }
     };
 
-    // 4. RENDER TABEL PREVIEW
+    // 4. RENDER PREVIEW TABEL DARI STOCKBIT KE DASHBOARD
     function renderPreviewTable(presetKey, headers, rows) {
         const container = document.getElementById('preview-container');
         const title = document.getElementById('preview-title');
@@ -293,8 +303,8 @@
         const thead = document.getElementById('preview-thead');
         const tbody = document.getElementById('preview-tbody');
 
-        title.innerText = `Pratinjau Hasil: ${presetKey}`;
-        count.innerText = `${rows.length} Data Ditampilkan`;
+        title.innerText = `Pratinjau Hasil Screener: ${presetKey}`;
+        count.innerText = `${rows.length} Saham Ditemukan`;
 
         thead.innerHTML = '';
         if (headers.length > 0) {
@@ -322,7 +332,7 @@
         container.scrollIntoView({ behavior: 'smooth' });
     }
 
-    // 5. EKSPORT DATA KE GOOGLE SHEETS
+    // 5. DISPATCH DATA KE GOOGLE SHEETS VIA GAS
     window.exportDataToGAS = async function() {
         const btnExport = document.getElementById('btn-export');
         const data = window.currentScrapedData;
@@ -337,11 +347,10 @@
         if (!cfg) return;
 
         try {
-            btnExport.innerText = "EXPORTING...";
-            btnExport.style.opacity = "0.6";
+            btnExport.innerText = "SENDING TO GSHEETS...";
             btnExport.disabled = true;
 
-            updateLog(`Mengirim ${data.length} baris data [${btnKey}] ke Google Sheets...`, 'info');
+            updateLog(`Mengirim ${data.length} baris ke Google Sheets (Sheet: ${cfg.sheet}, Col: ${cfg.startCol})...`);
 
             const payload = {
                 presetName: btnKey,
@@ -357,13 +366,12 @@
                 body: JSON.stringify(payload)
             });
 
-            updateLog(`✅ EXPORT SUKSES! ${data.length} baris data [${btnKey}] terkirim ke Sheet: ${cfg.sheet} (Kolom ${cfg.startCol}).`, 'info');
+            updateLog(`✅ Berhasil! Data [${btnKey}] berhasil dikirim ke Google Sheets.`, 'info');
 
         } catch (err) {
-            updateLog(`❌ Gagal Export: ${err.message}`, 'error');
+            updateLog(`Gagal Export: ${err.message}`, 'error');
         } finally {
-            btnExport.innerText = "EXPORT";
-            btnExport.style.opacity = "1";
+            btnExport.innerText = "EXPORT TO GSHEETS";
             btnExport.disabled = false;
         }
     };
