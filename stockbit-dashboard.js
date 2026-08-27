@@ -41,136 +41,129 @@
         return;
     }
 
-    // 2. BUILD OVERLAY UI (BACKGROUND TRANSPARAN + BLUR)
+    // 2. BUILD OVERLAY & MODAL CONTAINER (SAMA DENGAN CONTOH REFERENSI)
     const overlay = document.createElement('div');
     overlay.id = 'sb-full-dashboard';
+    
+    // Backdrop gelap semu transparan & posisi terpusat
     overlay.style = `
         position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-        background: rgba(0, 0, 0, 0.45); backdrop-filter: blur(1px); -webkit-backdrop-filter: blur(1px);
+        background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
         z-index: 999999; color: #e2e8f0; font-family: 'Inter', system-ui, sans-serif;
-        overflow-y: auto; padding: 40px 20px; box-sizing: border-box;
-        transition: opacity 0.3s ease; pointer-events: none;
+        display: flex; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box;
     `;
 
+    // Modal Box Terpusat
     overlay.innerHTML = `
-        <div style="max-width: 1100px; margin: 0 auto; pointer-events: auto;">
+        <div style="width: 100%; max-width: 800px; max-height: 90vh; background: #0f172a; border: 1px solid #1e293b; border-radius: 16px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);">
             
-            <!-- HEADER -->
-            <div style="background: rgba(17, 24, 39, 0.85); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 24px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
-                <div>
-                    <div style="display: flex; align-items: center; gap: 12px;">
-                        <div style="background: #059669; padding: 8px; border-radius: 10px; display: flex;">⚡</div>
-                        <h1 style="margin: 0; font-size: 22px; font-weight: 700; color: #fff;">STOCKBIT TOOLS <span style="font-size: 12px; font-weight: normal; color: #10b981; background: rgba(16,185,129,0.2); padding: 4px 8px; border-radius: 20px;">v4.2 Transparent UI</span></h1>
+            <!-- HEADER MODAL -->
+            <div style="background: #020617; border-bottom: 1px solid #1e293b; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="background: #059669; padding: 6px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">⚡</div>
+                    <div>
+                        <h1 style="margin: 0; font-size: 16px; font-weight: 700; color: #fff;">STOCKBIT TOOLS <span style="font-size: 11px; font-weight: normal; color: #10b981; background: rgba(16,185,129,0.15); padding: 2px 6px; border-radius: 12px; margin-left: 6px;">v5.0 Centered Modal</span></h1>
                     </div>
-                    <p style="margin: 8px 0 0 0; color: #9ca3af; font-size: 13px;">Stockbit Scraper & Automation Management Dashboard Overlay</p>
                 </div>
-                <button onclick="document.getElementById('sb-full-dashboard').remove()" style="background: #ef4444; color: #fff; border: none; padding: 10px 20px; border-radius: 10px; font-weight: 600; cursor: pointer;">✕ Tutup Dashboard</button>
+                <button onclick="document.getElementById('sb-full-dashboard').remove()" style="background: #1e293b; color: #94a3b8; border: 1px solid #334155; width: 32px; height: 32px; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#94a3b8'">✕</button>
             </div>
 
-            <!-- CARDS GRID -->
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; margin-top: 30px;">
+            <!-- BODY CONTENT (SCROLLABLE IF NEEDED) -->
+            <div style="padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px;">
                 
-                <!-- CARD 1: SCREENER AUTOMATION -->
-                <div class="dash-card">
-                    <div class="card-header">
-                        <span class="card-icon">📊</span>
-                        <div>
-                            <h3 class="card-title">SCREENER AUTOMATION</h3>
+                <!-- CARDS GRID -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 15px;">
+                    
+                    <!-- CARD 1: SCREENER AUTOMATION -->
+                    <div class="dash-card">
+                        <div class="card-header">
+                            <span class="card-title">SCREENER AUTOMATION</span>
                             <span class="card-badge">01</span>
                         </div>
+                        <p class="card-desc">Modul penarik data 5 preset Screener ke GSheets.</p>
+                        <div style="display: flex; flex-direction: column; gap: 6px; margin-top: 10px;">
+                            <button class="action-btn" onclick="runScreenerAutomation('FINAL BPJS - ONE DAY TRADE')">🔥 FINAL BPJS</button>
+                            <button class="action-btn" onclick="runScreenerAutomation('BD SANGKUT')">⚡ BD SANGKUT</button>
+                            <button class="action-btn" onclick="runScreenerAutomation('REMORA')">🦈 REMORA</button>
+                            <button class="action-btn" onclick="runScreenerAutomation('SIDEWAYS 1')">📈 SIDEWAYS 1</button>
+                            <button class="action-btn" onclick="runScreenerAutomation('SIDEWAYS 2')">📉 SIDEWAYS 2</button>
+                        </div>
                     </div>
-                    <p class="card-desc">Modul penarik data 5 preset Screener Stockbit secara otomatis & dispatch ke GSheets.</p>
-                    <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 15px;">
-                        <button class="action-btn" onclick="runScreenerAutomation('FINAL BPJS - ONE DAY TRADE')">🔥 FINAL BPJS - ONE DAY TRADE</button>
-                        <button class="action-btn" onclick="runScreenerAutomation('BD SANGKUT')">⚡ BD SANGKUT</button>
-                        <button class="action-btn" onclick="runScreenerAutomation('REMORA')">🦈 REMORA</button>
-                        <button class="action-btn" onclick="runScreenerAutomation('SIDEWAYS 1')">📈 SIDEWAYS 1</button>
-                        <button class="action-btn" onclick="runScreenerAutomation('SIDEWAYS 2')">📉 SIDEWAYS 2</button>
-                    </div>
-                </div>
 
-                <!-- CARD 2: BROKER ANALYSIS -->
-                <div class="dash-card">
-                    <div class="card-header">
-                        <span class="card-icon">🔍</span>
-                        <div>
-                            <h3 class="card-title">BROKER ANALYSIS</h3>
+                    <!-- CARD 2: BROKER ANALYSIS -->
+                    <div class="dash-card">
+                        <div class="card-header">
+                            <span class="card-title">BROKER ANALYSIS</span>
                             <span class="card-badge">02</span>
                         </div>
-                    </div>
-                    <p class="card-desc">Automasi pencarian kode saham & scraping akum/distribusi Top Broker.</p>
-                    <div style="margin-top: 15px;">
-                        <input type="text" placeholder="Kode Saham (cth: BBCA, BMRI)" class="dash-input">
-                        <button class="action-btn-primary" style="margin-top: 10px;" onclick="updateLog('Modul 02 belum diaktifkan', 'warning')">🚀 Scrape Broker Analysis</button>
-                    </div>
-                </div>
-
-                <!-- CARD 3: BROKER ACTIVITY -->
-                <div class="dash-card">
-                    <div class="card-header">
-                        <span class="card-icon">📅</span>
-                        <div>
-                            <h3 class="card-title">BROKER ACTIVITY</h3>
-                            <span class="card-badge">03</span>
+                        <p class="card-desc">Automasi pencarian kode saham & akum/distribusi Top Broker.</p>
+                        <div style="margin-top: 10px; display: flex; flex-direction: column; gap: 8px;">
+                            <input type="text" placeholder="Kode Saham (cth: BBCA)" class="dash-input">
+                            <button class="action-btn-primary" onclick="updateLog('Modul 02 belum diaktifkan', 'warning')">🚀 Scrape Analysis</button>
                         </div>
                     </div>
-                    <p class="card-desc">Fetch data transaksi broker berdasarkan Date Range yang ditentukan.</p>
-                    <div style="margin-top: 15px;">
-                        <input type="date" class="dash-input" style="margin-bottom: 8px;">
-                        <input type="date" class="dash-input">
-                        <button class="action-btn-primary" style="margin-top: 10px; background: #f59e0b;" onclick="updateLog('Modul 03 belum diaktifkan', 'warning')">🚀 Fetch Broker Activity</button>
+
+                    <!-- CARD 3: BROKER ACTIVITY -->
+                    <div class="dash-card">
+                        <div class="card-header">
+                            <span class="card-title">BROKER ACTIVITY</span>
+                            <span class="card-badge">03</span>
+                        </div>
+                        <p class="card-desc">Fetch data transaksi broker berdasarkan Date Range.</p>
+                        <div style="margin-top: 10px; display: flex; flex-direction: column; gap: 6px;">
+                            <input type="date" class="dash-input">
+                            <input type="date" class="dash-input">
+                            <button class="action-btn-primary" style="background: #f59e0b;" onclick="updateLog('Modul 03 belum diaktifkan', 'warning')">🚀 Fetch Activity</button>
+                        </div>
                     </div>
+
                 </div>
 
-            </div>
+                <!-- STATUS LOG -->
+                <div id="dash-log" style="background: #020617; border: 1px solid #1e293b; padding: 12px 15px; border-radius: 10px; color: #10b981; font-size: 12px; font-family: monospace;">
+                    Status: Modal terpusat aktif. Siap dijalankan.
+                </div>
 
-            <!-- STATUS LOG -->
-            <div id="dash-log" style="margin-top: 25px; background: rgba(17, 24, 39, 0.85); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); padding: 15px; border-radius: 12px; color: #10b981; font-size: 13px; font-family: monospace;">
-                Status: System Ready. Dashboard transparan aktif.
-            </div>
-
-            <!-- AREA PREVIEW TABEL & ACTION BUTTONS -->
-            <div id="preview-container" style="margin-top: 20px; background: rgba(17, 24, 39, 0.9); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 20px; display: none;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 12px;">
-                    <div>
-                        <h3 id="preview-title" style="margin: 0; color: #fff; font-size: 16px;">Hasil Screener</h3>
-                        <span id="preview-count" style="font-size: 12px; color: #9ca3af;">0 Data Ditemukan</span>
-                    </div>
-                    <div style="display: flex; gap: 10px; align-items: center;">
-                        <button id="btn-export" onclick="exportDataToGAS()" style="background: #10b981; color: #fff; border: none; padding: 8px 18px; border-radius: 8px; font-weight: 700; cursor: pointer; transition: 0.2s;">
+                <!-- PREVIEW TABLE CONTAINER -->
+                <div id="preview-container" style="background: #020617; border: 1px solid #1e293b; border-radius: 12px; padding: 15px; display: none;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid #1e293b; padding-bottom: 8px;">
+                        <div>
+                            <h3 id="preview-title" style="margin: 0; color: #fff; font-size: 14px;">Hasil Screener</h3>
+                            <span id="preview-count" style="font-size: 11px; color: #64748b;">0 Data Ditemukan</span>
+                        </div>
+                        <button id="btn-export" onclick="exportDataToGAS()" style="background: #10b981; color: #fff; border: none; padding: 6px 14px; border-radius: 6px; font-weight: 700; font-size: 12px; cursor: pointer;">
                             EXPORT TO GSHEETS
                         </button>
                     </div>
+
+                    <div style="overflow-x: auto; max-height: 250px; overflow-y: auto;">
+                        <table id="preview-table" style="width: 100%; border-collapse: collapse; font-size: 12px; text-align: left; color: #cbd5e1;">
+                            <thead id="preview-thead" style="position: sticky; top: 0; background: #1e293b; color: #10b981;"></thead>
+                            <tbody id="preview-tbody"></tbody>
+                        </table>
+                    </div>
                 </div>
 
-                <div style="overflow-x: auto; max-height: 400px; overflow-y: auto;">
-                    <table id="preview-table" style="width: 100%; border-collapse: collapse; font-size: 13px; text-align: left; color: #e2e8f0;">
-                        <thead id="preview-thead" style="position: sticky; top: 0; background: #1f2937; color: #10b981;"></thead>
-                        <tbody id="preview-tbody"></tbody>
-                    </table>
-                </div>
             </div>
-
         </div>
     `;
 
     document.body.appendChild(overlay);
 
-    // STYLES SEMI-TRANSPARAN
+    // CSS STYLES UNTUK KOMPONEN DI DALAM MODAL
     const style = document.createElement('style');
     style.innerHTML = `
-        .dash-card { background: rgba(17, 24, 39, 0.85); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; }
+        .dash-card { background: #020617; border: 1px solid #1e293b; border-radius: 12px; padding: 14px; display: flex; flex-direction: column; justify-content: space-between; }
         .card-header { display: flex; justify-content: space-between; align-items: center; }
-        .card-icon { font-size: 24px; background: rgba(31, 41, 55, 0.8); padding: 8px; border-radius: 10px; }
-        .card-title { margin: 0; font-size: 15px; font-weight: 700; color: #f3f4f6; }
-        .card-badge { font-size: 11px; color: #3b82f6; background: rgba(59,130,246,0.2); padding: 2px 8px; border-radius: 10px; font-weight: bold; }
-        .card-desc { font-size: 12px; color: #9ca3af; margin-top: 10px; line-height: 1.4; }
-        .dash-input { width: 100%; padding: 10px; background: rgba(31, 41, 55, 0.8); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #fff; box-sizing: border-box; }
-        .action-btn { width: 100%; padding: 10px; background: rgba(31, 41, 55, 0.8); border: 1px solid rgba(255,255,255,0.1); color: #e5e7eb; border-radius: 8px; text-align: left; cursor: pointer; font-size: 12px; font-weight: 600; }
-        .action-btn:hover { background: rgba(55, 65, 81, 0.9); border-color: #3b82f6; color: #fff; }
-        .action-btn-primary { width: 100%; padding: 10px; background: #10b981; color: #fff; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        #preview-table td, #preview-table th { padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.08); white-space: nowrap; }
-        #preview-table tbody tr:hover { background: rgba(255,255,255,0.05); }
+        .card-title { margin: 0; font-size: 12px; font-weight: 700; color: #f1f5f9; }
+        .card-badge { font-size: 10px; color: #38bdf8; background: rgba(56,189,248,0.1); padding: 1px 6px; border-radius: 8px; font-weight: bold; }
+        .card-desc { font-size: 11px; color: #64748b; margin-top: 6px; line-height: 1.3; }
+        .dash-input { width: 100%; padding: 8px; background: #0f172a; border: 1px solid #334155; border-radius: 6px; color: #fff; font-size: 12px; box-sizing: border-box; }
+        .action-btn { width: 100%; padding: 8px; background: #0f172a; border: 1px solid #334155; color: #cbd5e1; border-radius: 6px; text-align: left; cursor: pointer; font-size: 11px; font-weight: 600; }
+        .action-btn:hover { background: #1e293b; border-color: #38bdf8; color: #fff; }
+        .action-btn-primary { width: 100%; padding: 8px; background: #10b981; color: #fff; border: none; border-radius: 6px; font-weight: bold; font-size: 11px; cursor: pointer; }
+        #preview-table td, #preview-table th { padding: 8px 10px; border-bottom: 1px solid #1e293b; white-space: nowrap; }
+        #preview-table tbody tr:hover { background: rgba(255,255,255,0.03); }
     `;
     document.head.appendChild(style);
 
