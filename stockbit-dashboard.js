@@ -46,7 +46,7 @@
     overlay.id = 'sb-full-dashboard';
     overlay.style = `
         position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-        background: rgba(10, 14, 23, 0.45); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
+        background: rgba(10, 14, 23, 0.45); backdrop-filter: blur(1px); -webkit-backdrop-filter: blur(1px);
         z-index: 999999; color: #e2e8f0; font-family: 'Inter', system-ui, sans-serif;
         overflow-y: auto; padding: 40px 20px; box-sizing: border-box;
         transition: opacity 0.3s ease; pointer-events: none;
