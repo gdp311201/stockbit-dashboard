@@ -33,11 +33,9 @@
         }
     };
 
-    // Buffer Sementara Data Scraped Sebelum Didelegasikan/Export
     window.currentScrapedData = null;
     window.currentPresetKey = null;
 
-    // Toggle Dashboard UI Overlay
     if (document.getElementById('sb-full-dashboard')) {
         document.getElementById('sb-full-dashboard').remove();
         return;
@@ -51,6 +49,7 @@
         background: rgba(10, 14, 23, 0.95); backdrop-filter: blur(10px);
         z-index: 999999; color: #e2e8f0; font-family: 'Inter', system-ui, sans-serif;
         overflow-y: auto; padding: 40px 20px; box-sizing: border-box;
+        transition: opacity 0.3s ease;
     `;
 
     overlay.innerHTML = `
@@ -61,7 +60,7 @@
                 <div>
                     <div style="display: flex; align-items: center; gap: 12px;">
                         <div style="background: #059669; padding: 8px; border-radius: 10px; display: flex;">⚡</div>
-                        <h1 style="margin: 0; font-size: 22px; font-weight: 700; color: #fff;">STOCKBIT TOOLS <span style="font-size: 12px; font-weight: normal; color: #10b981; background: rgba(16,185,129,0.1); padding: 4px 8px; border-radius: 20px;">v3.2 Interactive Preview</span></h1>
+                        <h1 style="margin: 0; font-size: 22px; font-weight: 700; color: #fff;">STOCKBIT TOOLS <span style="font-size: 12px; font-weight: normal; color: #10b981; background: rgba(16,185,129,0.1); padding: 4px 8px; border-radius: 20px;">v3.3 Safe-Click</span></h1>
                     </div>
                     <p style="margin: 8px 0 0 0; color: #9ca3af; font-size: 13px;">Stockbit Scraper & Automation Management Dashboard Overlay</p>
                 </div>
@@ -179,7 +178,6 @@
     `;
     document.head.appendChild(style);
 
-    // LOG UTILITY
     window.updateLog = function(msg, type = 'info') {
         const log = document.getElementById('dash-log');
         if (!log) return;
@@ -190,7 +188,7 @@
 
     const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-    // 3. LOGIKA AUTOMATED NAVIGATION & SCRAPING TABEL
+    // 3. LOGIKA AUTOMATED NAVIGATION DENGAN AUTO-HIDE DASHBOARD
     window.runScreenerAutomation = async function(btnKey) {
         const cfg = SCREENER_CONFIGS[btnKey];
         if (!cfg) {
@@ -203,11 +201,16 @@
             return;
         }
 
+        const dashEl = document.getElementById('sb-full-dashboard');
+
         try {
             updateLog(`Memulai perpindahan ke screener: "${cfg.targetName}"...`, 'info');
 
+            // SEMBUNYIKAN DASHBOARD AGAR ELEMENT STOCKBIT BISA DIKLIK
+            if (dashEl) dashEl.style.display = 'none';
+
             // STEP A: KLIK DROPDOWN FAVORITES
-            let favDropdown = Array.from(document.querySelectorAll('p, div, button')).find(el => 
+            let favDropdown = Array.from(document.querySelectorAll('p, div, button, span')).find(el => 
                 el.innerText && el.innerText.trim() === 'Favorites'
             );
 
@@ -217,48 +220,41 @@
 
             if (favDropdown) {
                 favDropdown.click();
-                await sleep(500);
+                await sleep(600);
             } else {
-                updateLog(`Tombol 'Favorites' tidak ditemukan.`, 'error');
+                if (dashEl) dashEl.style.display = 'block';
+                updateLog(`Tombol 'Favorites' tidak ditemukan di halaman Stockbit.`, 'error');
                 return;
             }
 
             // STEP B: KLIK ITEM MENU
-            const menuItems = Array.from(document.querySelectorAll('.ant-popover-inner-content div, .ant-popover-inner-content p'));
+            const menuItems = Array.from(document.querySelectorAll('.ant-popover-inner-content div, .ant-popover-inner-content p, .ant-dropdown-menu-item'));
             const targetMenuItem = menuItems.find(el => el.innerText && (el.innerText.trim().toUpperCase().includes(btnKey.toUpperCase()) || el.innerText.trim().includes(cfg.targetName)));
 
             if (targetMenuItem) {
                 targetMenuItem.click();
-                updateLog(`Preset "${cfg.targetName}" diklik. Menunggu pemuatan data...`, 'info');
-                await sleep(1500);
+                await sleep(2000); // Tunggu Stockbit memuat tabel baru
             } else {
+                if (dashEl) dashEl.style.display = 'block';
                 updateLog(`Pilihan "${cfg.targetName}" tidak ditemukan di daftar Favorites.`, 'error');
                 return;
             }
 
-            // STEP C: VERIFIKASI SCREEN NAME
-            const screenNameInput = document.querySelector('input[name="screenName"]');
-            if (screenNameInput) {
-                updateLog(`Screen Name Aktif: "${screenNameInput.value}"`, 'info');
-            }
-
-            // STEP D: AMBIL HEADER & BODY TABEL STOCKBIT
-            const tableEl = document.querySelector('table');
+            // STEP C: AMBIL DATA TABEL
             const tbody = document.querySelector('tbody.ant-table-tbody');
             const thead = document.querySelector('thead.ant-table-thead');
 
             if (!tbody) {
+                if (dashEl) dashEl.style.display = 'block';
                 updateLog(`Tabel screener belum siap atau tidak ditemukan.`, 'error');
                 return;
             }
 
-            // Ekstraksi Header
             let headers = [];
             if (thead) {
                 headers = Array.from(thead.querySelectorAll('th')).map(th => th.innerText.trim().replace(/\n/g, ' '));
             }
 
-            // Ekstraksi Data Rows
             const rowElements = Array.from(tbody.querySelectorAll('tr'));
             const scrapedData = [];
 
@@ -269,20 +265,22 @@
                 }
             });
 
+            // TAMPILKAN KEMBALI DASHBOARD DENGAN TABEL PREVIEW
+            if (dashEl) dashEl.style.display = 'block';
+
             if (scrapedData.length === 0) {
                 updateLog(`Data tabel kosong / belum dimuat oleh Stockbit.`, 'warning');
                 return;
             }
 
-            // SIMPAN DATA KE BUFFER
             window.currentScrapedData = scrapedData;
             window.currentPresetKey = btnKey;
 
-            // DISPLAY DATA KE PREVIEW DASHBOARD
             renderPreviewTable(btnKey, headers, scrapedData);
             updateLog(`Tabel [${btnKey}] berhasil dipratinjau (${scrapedData.length} baris). Siap Di-export!`, 'info');
 
         } catch (err) {
+            if (dashEl) dashEl.style.display = 'block';
             updateLog(`❌ Terjadi Kesalahan: ${err.message}`, 'error');
         }
     };
@@ -298,7 +296,6 @@
         title.innerText = `Pratinjau Hasil: ${presetKey}`;
         count.innerText = `${rows.length} Data Ditampilkan`;
 
-        // Render Header
         thead.innerHTML = '';
         if (headers.length > 0) {
             const tr = document.createElement('tr');
@@ -310,7 +307,6 @@
             thead.appendChild(tr);
         }
 
-        // Render Body Rows
         tbody.innerHTML = '';
         rows.forEach(rData => {
             const tr = document.createElement('tr');
@@ -322,12 +318,11 @@
             tbody.appendChild(tr);
         });
 
-        // Tampilkan Container
         container.style.display = 'block';
         container.scrollIntoView({ behavior: 'smooth' });
     }
 
-    // 5. EKSPORT DATA KE GOOGLE SHEETS VIA GAS
+    // 5. EKSPORT DATA KE GOOGLE SHEETS
     window.exportDataToGAS = async function() {
         const btnExport = document.getElementById('btn-export');
         const data = window.currentScrapedData;
