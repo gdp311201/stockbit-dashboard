@@ -80,9 +80,9 @@
                         </div>
                         <p class="card-desc">Modul penarik data 5 preset Screener ke GSheets.</p>
                         <div style="display: flex; flex-direction: column; gap: 6px; margin-top: 10px;">
-                            <button class="action-btn" onclick="runScreenerAutomation('FINAL BPJS')">🔥 FINAL BPJS</button>
-                            <button class="action-btn" onclick="runScreenerAutomation('BD1')">⚡ BD SANGKUT</button>
-                            <button class="action-btn" onclick="runScreenerAutomation('REMORA1')">🦈 REMORA</button>
+                            <button class="action-btn" onclick="runScreenerAutomation('FINAL BPJS - ONE DAY TRADE')">🔥 FINAL BPJS</button>
+                            <button class="action-btn" onclick="runScreenerAutomation('BD SANGKUT')">⚡ BD SANGKUT</button>
+                            <button class="action-btn" onclick="runScreenerAutomation('REMORA')">🦈 REMORA</button>
                             <button class="action-btn" onclick="runScreenerAutomation('SIDEWAYS 1')">📈 SIDEWAYS 1</button>
                             <button class="action-btn" onclick="runScreenerAutomation('SIDEWAYS 2')">📉 SIDEWAYS 2</button>
                         </div>
