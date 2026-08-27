@@ -60,7 +60,7 @@
                 <div style="display: flex; align-items: center; gap: 10px;">
                     <div style="background: #059669; padding: 6px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">⚡</div>
                     <div>
-                        <h1 style="margin: 0; font-size: 16px; font-weight: 700; color: #fff;">STOCKBIT TOOLS <span style="font-size: 11px; font-weight: normal; color: #10b981; background: rgba(16,185,129,0.15); padding: 2px 6px; border-radius: 12px; margin-left: 6px;">v5.1 Auto Switch</span></h1>
+                        <h1 style="margin: 0; font-size: 16px; font-weight: 700; color: #fff;">STOCKBIT TOOLS <span style="font-size: 11px; font-weight: normal; color: #10b981; background: rgba(16,185,129,0.15); padding: 2px 6px; border-radius: 12px; margin-left: 6px;">v5.2 Auto Switch Fixed</span></h1>
                     </div>
                 </div>
                 <button onclick="document.getElementById('sb-full-dashboard').remove()" style="background: #1e293b; color: #94a3b8; border: 1px solid #334155; width: 32px; height: 32px; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#94a3b8'">✕</button>
@@ -174,15 +174,14 @@
 
     const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-    function triggerReactClick(element) {
+    function triggerFullClick(element) {
         if (!element) return;
-        const opts = { bubbles: true, cancelable: true, view: window };
-        element.dispatchEvent(new MouseEvent('mousedown', opts));
-        element.dispatchEvent(new MouseEvent('mouseup', opts));
-        element.dispatchEvent(new MouseEvent('click', opts));
+        ['mousedown', 'mouseup', 'click'].forEach(evt => {
+            element.dispatchEvent(new MouseEvent(evt, { bubbles: true, cancelable: true, view: window }));
+        });
     }
 
-    // 3. AUTOMATED SCREENER EXECUTOR (FIXED DYNAMIC NAVIGATION)
+    // 3. AUTOMATED SCREENER EXECUTOR (FIXED DROPDOWN SWITCH)
     window.runScreenerAutomation = async function(btnKey) {
         const cfg = SCREENER_CONFIGS[btnKey];
         if (!cfg) return;
@@ -192,57 +191,52 @@
 
             let targetClicked = false;
 
-            // CARA A: Cari Tab Tombol Screener yang tampil langsung di Web Stockbit
-            const allButtons = Array.from(document.querySelectorAll('button, div, a, span'));
-            for (let el of allButtons) {
-                const text = (el.innerText || '').trim().toUpperCase();
-                // Memastikan elemen tersebut adalah tab preset Stockbit (bukan tombol dari Modal Dashboard)
-                if (!el.closest('#sb-full-dashboard') && cfg.targetKeywords.some(kw => text.includes(kw.toUpperCase()))) {
-                    triggerReactClick(el);
-                    targetClicked = true;
-                    break;
+            // STRATEGI 1: Buka Dropdown Select Preset Stockbit (Ant Design Selector)
+            const selectors = Array.from(document.querySelectorAll('.ant-select-selector, .ant-select-selection-search-input'));
+            for (let selectEl of selectors) {
+                if (selectEl.closest('#sb-full-dashboard')) continue;
+                
+                triggerFullClick(selectEl);
+                if (selectEl.focus) selectEl.focus();
+                await sleep(500);
+
+                // Cari item pada Popup Option Ant Design yang dirender di portal
+                const options = Array.from(document.querySelectorAll('.ant-select-item-option, .ant-dropdown-menu-item, div[role="option"]'));
+                for (let opt of options) {
+                    const txt = (opt.innerText || '').toUpperCase();
+                    if (cfg.targetKeywords.some(kw => txt.includes(kw.toUpperCase()))) {
+                        triggerFullClick(opt);
+                        targetClicked = true;
+                        break;
+                    }
                 }
+                if (targetClicked) break;
             }
 
-            // CARA B: Jika tidak ada di Tab langsung, coba buka Dropdown Favorites / Preset
+            // STRATEGI 2: Jika bukan Dropdown, cari Tab/Tombol langsung di Web
             if (!targetClicked) {
-                let dropdown = Array.from(document.querySelectorAll('*')).find(el => {
-                    const text = el.innerText ? el.innerText.trim() : '';
-                    return (text === 'Favorites' || text.includes('My Preset')) && el.children.length === 0 && !el.closest('#sb-full-dashboard');
-                });
-
-                if (!dropdown) {
-                    dropdown = document.querySelector('.ant-select-selector') || 
-                               document.querySelector('[class*="screener-dropdown"]') ||
-                               document.querySelector('.ant-dropdown-trigger');
-                }
-
-                if (dropdown) {
-                    triggerReactClick(dropdown.parentElement || dropdown);
-                    await sleep(600);
-
-                    let items = Array.from(document.querySelectorAll('.ant-dropdown-menu-item, .ant-popover-inner-content div, .ant-select-item-option'));
-                    for (let item of items) {
-                        const itemText = (item.innerText || '').toUpperCase();
-                        if (cfg.targetKeywords.some(kw => itemText.includes(kw.toUpperCase()))) {
-                            triggerReactClick(item);
-                            targetClicked = true;
-                            break;
-                        }
+                const elements = Array.from(document.querySelectorAll('button, div, a, span, li'));
+                for (let el of elements) {
+                    if (el.closest('#sb-full-dashboard')) continue;
+                    const text = (el.innerText || '').trim().toUpperCase();
+                    if (cfg.targetKeywords.some(kw => text === kw.toUpperCase() || text.includes(kw.toUpperCase()))) {
+                        triggerFullClick(el);
+                        targetClicked = true;
+                        break;
                     }
                 }
             }
 
             if (!targetClicked) {
-                updateLog(`Gagal: Tab/Preset "${btnKey}" tidak ditemukan di Stockbit.`, 'error');
+                updateLog(`Gagal: Tab/Preset "${btnKey}" tidak ditemukan di Stockbit. Pastikan nama preset sesuai.`, 'error');
                 return;
             }
 
-            // BERI WAKTU UNTUK STOCKBIT RE-RENDER / FETCH DATA DARI SERVER (3 Detik)
-            updateLog(`Memuat data screener [${btnKey}]... Harap tunggu.`);
-            await sleep(3000);
+            // MINTA STOCKBIT PROSES FETCHING & WAITING RE-RENDER
+            updateLog(`Mengunduh data [${btnKey}]... Harap tunggu.`);
+            await sleep(4000); 
 
-            // STEP C: SCRAPE DATA TABEL HASIL SETELAH RENDER SELESAI
+            // STEP 3: SCRAPE DATA TABEL REFRESHED
             const table = document.querySelector('table');
             const tbody = document.querySelector('tbody.ant-table-tbody') || (table ? table.querySelector('tbody') : null);
             const thead = document.querySelector('thead.ant-table-thead') || (table ? table.querySelector('thead') : null);
