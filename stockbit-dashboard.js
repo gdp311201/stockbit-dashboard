@@ -1,35 +1,40 @@
 (function() {
-    // 1. MAPPING KONFIGURASI SCREENER & DELEGASI GAS
+    // 1. MAPPING KONFIGURASI SCREENER (DISESUAIKAN DENGAN SCRIPT LAMA)
     const SCREENER_CONFIGS = {
         "FINAL BPJS - ONE DAY TRADE": {
             targetKeywords: ["FINAL BPJS - ONE DAY TRADE", "FINAL BPJS", "ONE DAY TRADE"],
+            id: "14ryEGNhvwm9XCuw-lo6tSfwDqRmGAK_ZlUpuKd0Pm8M",
             sheet: "SC",
             startCol: "T",
-            gasUrl: "https://script.google.com/macros/s/AKfycbz_GANTI_DENGAN_URL_GAS_LU/exec"
+            gasUrl: "https://script.google.com/macros/s/AKfycby867iVRm0RlVnipq4obh9vaxfzy6nyIJ9DkENATabCCb4Af8G4ylQvxcWPgJWpg3OnRw/exec"
         },
         "BD SANGKUT": {
             targetKeywords: ["BD - SANGKUT & AKUM", "BD SANGKUT", "BD - SANGKUT"],
+            id: "1U71XJEUU-HrHCkEeqAegKCtbXrSvVKApRpanlY-oW5s",
             sheet: "SC",
-            startCol: "AA",
-            gasUrl: "https://script.google.com/macros/s/AKfycbz_GANTI_DENGAN_URL_GAS_LU/exec"
+            startCol: "K",
+            gasUrl: "https://script.google.com/macros/s/AKfycbz8HY3ETVtKgXh20MEJVaxbuXWdDZ_KFYE1MCgi32MnSKHMtqtIWzHib4UddM3ARzIOlQ/exec"
         },
         "REMORA": {
             targetKeywords: ["REMORA - SIAP NAIK CEPAT", "REMORA", "SIAP NAIK CEPAT"],
+            id: "1Tsf_o8-hRa4fBg96Xwlayeiz--ngpm6iZ5M_ZOxGFSU",
             sheet: "SC",
-            startCol: "AH",
-            gasUrl: "https://script.google.com/macros/s/AKfycbz_GANTI_DENGAN_URL_GAS_LU/exec"
+            startCol: "K",
+            gasUrl: "https://script.google.com/macros/s/AKfycbw3aj5cYW8pxqySQ_OsLPBAStBqm1DDUBEkBdphN4EF9JeNGhYAgZza8hfy0H1RLAKSkQ/exec"
         },
         "SIDEWAYS 1": {
             targetKeywords: ["SIDEWAYS SCREENER V1", "SIDEWAYS 1", "SIDEWAYS V1"],
+            id: "1k1yFDcq0hy1OPsnk3nPrrEN-oyRMqZc8D4bC9S-ENEE",
             sheet: "SC",
-            startCol: "AO",
-            gasUrl: "https://script.google.com/macros/s/AKfycbz_GANTI_DENGAN_URL_GAS_LU/exec"
+            startCol: "N",
+            gasUrl: "https://script.google.com/macros/s/AKfycbz21YHHZ1IBLJGHczs-YK43CyONm996uPw7ltzsHWxZORmb8YkpxIKK18SQSPluCqSd/exec"
         },
         "SIDEWAYS 2": {
             targetKeywords: ["SIDEWAYS SCREENER V2", "SIDEWAYS 2", "SIDEWAYS V2"],
+            id: "1k1yFDcq0hy1OPsnk3nPrrEN-oyRMqZc8D4bC9S-ENEE",
             sheet: "SC",
-            startCol: "AV",
-            gasUrl: "https://script.google.com/macros/s/AKfycbz_GANTI_DENGAN_URL_GAS_LU/exec"
+            startCol: "AB",
+            gasUrl: "https://script.google.com/macros/s/AKfycbz21YHHZ1IBLJGHczs-YK43CyONm996uPw7ltzsHWxZORmb8YkpxIKK18SQSPluCqSd/exec"
         }
     };
 
@@ -40,6 +45,15 @@
         document.getElementById('sb-full-dashboard').remove();
         return;
     }
+
+    // Helper Format Tanggal (Sesuai Script Scraper Lama: 27 Aug 26)
+    const formatDateStr = (isoDate) => {
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const d = new Date(isoDate);
+        return `${String(d.getDate()).padStart(2, '0')} ${months[d.getMonth()]} ${String(d.getFullYear()).slice(-2)}`;
+    };
+
+    const todayIso = new Date().toISOString().split('T')[0];
 
     // 2. BUILD OVERLAY & MODAL CONTAINER
     const overlay = document.createElement('div');
@@ -53,14 +67,14 @@
     `;
 
     overlay.innerHTML = `
-        <div style="width: 100%; max-width: 800px; max-height: 90vh; background: #0f172a; border: 1px solid #1e293b; border-radius: 16px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);">
+        <div style="width: 100%; max-width: 820px; max-height: 90vh; background: #0f172a; border: 1px solid #1e293b; border-radius: 16px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);">
             
             <!-- HEADER MODAL -->
             <div style="background: #020617; border-bottom: 1px solid #1e293b; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center;">
                 <div style="display: flex; align-items: center; gap: 10px;">
                     <div style="background: #059669; padding: 6px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">⚡</div>
                     <div>
-                        <h1 style="margin: 0; font-size: 16px; font-weight: 700; color: #fff;">STOCKBIT TOOLS <span style="font-size: 11px; font-weight: normal; color: #10b981; background: rgba(16,185,129,0.15); padding: 2px 6px; border-radius: 12px; margin-left: 6px;">v5.5 Hybrid Tab & Favorites Fix</span></h1>
+                        <h1 style="margin: 0; font-size: 16px; font-weight: 700; color: #fff;">STOCKBIT TOOLS <span style="font-size: 11px; font-weight: normal; color: #10b981; background: rgba(16,185,129,0.15); padding: 2px 6px; border-radius: 12px; margin-left: 6px;">v6.0 Integrated Gas</span></h1>
                     </div>
                 </div>
                 <button onclick="document.getElementById('sb-full-dashboard').remove()" style="background: #1e293b; color: #94a3b8; border: 1px solid #334155; width: 32px; height: 32px; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#94a3b8'">✕</button>
@@ -78,7 +92,7 @@
                             <span class="card-title">SCREENER AUTOMATION</span>
                             <span class="card-badge">01</span>
                         </div>
-                        <p class="card-desc">Modul penarik data 5 preset Screener ke GSheets.</p>
+                        <p class="card-desc">Pilih preset screener untuk memuat data secara otomatis.</p>
                         <div style="display: flex; flex-direction: column; gap: 6px; margin-top: 10px;">
                             <button class="action-btn" onclick="runScreenerAutomation('FINAL BPJS - ONE DAY TRADE')">🔥 FINAL BPJS</button>
                             <button class="action-btn" onclick="runScreenerAutomation('BD SANGKUT')">⚡ BD SANGKUT</button>
@@ -119,19 +133,27 @@
 
                 <!-- STATUS LOG -->
                 <div id="dash-log" style="background: #020617; border: 1px solid #1e293b; padding: 12px 15px; border-radius: 10px; color: #10b981; font-size: 12px; font-family: monospace;">
-                    Status: Modal terpusat aktif. Siap dijalankan.
+                    Status: Siap dijalankan.
                 </div>
 
                 <!-- PREVIEW TABLE CONTAINER -->
                 <div id="preview-container" style="background: #020617; border: 1px solid #1e293b; border-radius: 12px; padding: 15px; display: none;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid #1e293b; padding-bottom: 8px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid #1e293b; padding-bottom: 8px; flex-wrap: wrap; gap: 10px;">
                         <div>
                             <h3 id="preview-title" style="margin: 0; color: #fff; font-size: 14px;">Hasil Screener</h3>
                             <span id="preview-count" style="font-size: 11px; color: #64748b;">0 Data Ditemukan</span>
                         </div>
-                        <button id="btn-export" onclick="exportDataToGAS()" style="background: #10b981; color: #fff; border: none; padding: 6px 14px; border-radius: 6px; font-weight: 700; font-size: 12px; cursor: pointer;">
-                            EXPORT TO GSHEETS
-                        </button>
+
+                        <!-- DATE SELECTOR & EXPORT BUTTON -->
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div style="display: flex; align-items: center; gap: 5px;">
+                                <label style="font-size: 11px; color: #94a3b8; font-weight: 600;">Tanggal:</label>
+                                <input type="date" id="export-date" value="${todayIso}" class="dash-input" style="padding: 4px 8px; width: auto;">
+                            </div>
+                            <button id="btn-export" onclick="exportDataToGAS()" style="background: #10b981; color: #fff; border: none; padding: 7px 16px; border-radius: 6px; font-weight: 700; font-size: 12px; cursor: pointer;">
+                                EXPORT TO GSHEETS
+                            </button>
+                        </div>
                     </div>
 
                     <div style="overflow-x: auto; max-height: 250px; overflow-y: auto;">
@@ -161,6 +183,7 @@
         .action-btn-primary { width: 100%; padding: 8px; background: #10b981; color: #fff; border: none; border-radius: 6px; font-weight: bold; font-size: 11px; cursor: pointer; }
         #preview-table td, #preview-table th { padding: 8px 10px; border-bottom: 1px solid #1e293b; white-space: nowrap; }
         #preview-table tbody tr:hover { background: rgba(255,255,255,0.03); }
+        .dash-input::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
     `;
     document.head.appendChild(style);
 
@@ -181,7 +204,7 @@
         });
     }
 
-    // 3. AUTOMATED SCREENER EXECUTOR (HYBRID TAB & FAVORITES)
+    // 3. AUTOMATED SCREENER EXECUTOR
     window.runScreenerAutomation = async function(btnKey) {
         const cfg = SCREENER_CONFIGS[btnKey];
         if (!cfg) return;
@@ -192,14 +215,12 @@
             const initialFirstRowText = document.querySelector('tbody.ant-table-tbody tr')?.innerText || '';
             let targetClicked = false;
 
-            // LANGKAH A: CARI TAB SEBAGAI TOMBOL DIRECT DULU (Tampilan Horizontal atas)
+            // CARI DI TAB HORIZONTAL DULU
             const allElements = Array.from(document.querySelectorAll('button, div, span, a, li'));
             for (let el of allElements) {
                 if (el.closest('#sb-full-dashboard')) continue;
 
                 const text = (el.innerText || '').trim().toUpperCase();
-                
-                // Pastikan bukan tombol dropdown Favorites
                 if (text.startsWith('FAVORITES')) continue;
 
                 if (cfg.targetKeywords.some(kw => text === kw.toUpperCase())) {
@@ -210,7 +231,7 @@
                 }
             }
 
-            // LANGKAH B: JIKA TIDAK ADA DI TAB, BUKA DROPDOWN FAVORITES
+            // JIKA TIDAK ADA DI TAB, BUKA FAVORITES
             if (!targetClicked) {
                 const favoritesBtn = Array.from(document.querySelectorAll('div, button, span')).find(el => {
                     if (el.closest('#sb-full-dashboard')) return false;
@@ -236,11 +257,11 @@
             }
 
             if (!targetClicked) {
-                updateLog(`Gagal: Preset "${btnKey}" tidak ditemukan baik di Tab maupun Favorites.`, 'error');
+                updateLog(`Gagal: Preset "${btnKey}" tidak ditemukan.`, 'error');
                 return;
             }
 
-            // WAITING LOOP: Menunggu Stockbit memperbarui data di tabel background
+            // WAITING LOOP
             updateLog(`Memuat data [${btnKey}]... Harap tunggu.`);
             let checkRetry = 0;
 
@@ -254,7 +275,7 @@
                 checkRetry++;
             }
 
-            await sleep(1000); // Penstabil render DOM
+            await sleep(1000);
 
             // SCRAPE TABEL HASIL
             const table = document.querySelector('table');
@@ -338,31 +359,45 @@
         container.scrollIntoView({ behavior: 'smooth' });
     }
 
-    // 5. EXPORT KE GSHEETS
+    // 5. EXPORT KE GSHEETS (DENGAN STRUKTUR DARI SCRIPT SCRAPER LAMA)
     window.exportDataToGAS = async function() {
         const btnExport = document.getElementById('btn-export');
-        const data = window.currentScrapedData;
+        const dateInput = document.getElementById('export-date').value;
+        const rawRows = window.currentScrapedData;
         const btnKey = window.currentPresetKey;
 
-        if (!data || !btnKey) {
+        if (!rawRows || !btnKey) {
             updateLog(`Tidak ada data untuk di-export!`, 'warning');
             return;
         }
 
+        if (!dateInput) {
+            updateLog(`Pilih tanggal data terlebih dahulu!`, 'warning');
+            return;
+        }
+
         const cfg = SCREENER_CONFIGS[btnKey];
-        if (!cfg) return;
+        if (!cfg || !cfg.gasUrl) {
+            updateLog(`Konfigurasi GAS URL tidak ditemukan untuk [${btnKey}].`, 'error');
+            return;
+        }
 
         try {
-            btnExport.innerText = "SENDING TO GSHEETS...";
+            btnExport.innerText = "MENGIRIM...";
             btnExport.disabled = true;
 
-            updateLog(`Mengirim ${data.length} baris ke Google Sheets (Sheet: ${cfg.sheet}, Col: ${cfg.startCol})...`);
+            const dateStr = formatDateStr(dateInput);
+            // Tambahkan kolom tanggal di paling depan tiap baris data (persis script lama)
+            const finalRows = rawRows.map(row => [dateStr, ...row]);
 
+            updateLog(`Mengirim ${finalRows.length} baris ke Sheet '${cfg.sheet}' Kolom ${cfg.startCol}...`);
+
+            // Payload disesuaikan persis dengan script lama kamu
             const payload = {
-                presetName: btnKey,
+                spreadsheetId: cfg.id,
                 sheetName: cfg.sheet,
-                startColumn: cfg.startCol,
-                data: data
+                startCol: cfg.startCol,
+                rows: finalRows
             };
 
             await fetch(cfg.gasUrl, {
@@ -372,7 +407,7 @@
                 body: JSON.stringify(payload)
             });
 
-            updateLog(`✅ Berhasil! Data [${btnKey}] berhasil dikirim ke Google Sheets.`, 'info');
+            updateLog(`✅ Berhasil! Data ${finalRows.length} saham [${btnKey}] dikirim ke Sheet '${cfg.sheet}' Kolom ${cfg.startCol}.`, 'info');
 
         } catch (err) {
             updateLog(`Gagal Export: ${err.message}`, 'error');
