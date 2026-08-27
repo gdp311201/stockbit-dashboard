@@ -52,7 +52,7 @@
                 <div>
                     <div style="display: flex; align-items: center; gap: 12px;">
                         <div style="background: #059669; padding: 8px; border-radius: 10px; display: flex;">⚡</div>
-                        <h1 style="margin: 0; font-size: 22px; font-weight: 700; color: #fff;">STOCKBIT TOOLS <span style="font-size: 12px; font-weight: normal; color: #10b981; background: rgba(16,185,129,0.1); padding: 4px 8px; border-radius: 20px;">v2.1 Auto-Nav</span></h1>
+                        <h1 style="margin: 0; font-size: 22px; font-weight: 700; color: #fff;">STOCKBIT TOOLS <span style="font-size: 12px; font-weight: normal; color: #10b981; background: rgba(16,185,129,0.1); padding: 4px 8px; border-radius: 20px;">v2.2 Fixed UI</span></h1>
                     </div>
                     <p style="margin: 8px 0 0 0; color: #9ca3af; font-size: 13px;">Stockbit Scraper & Automation Management Dashboard Overlay</p>
                 </div>
@@ -157,24 +157,7 @@
         logEl.innerText = `[${new Date().toLocaleTimeString()}] Status: ${message}`;
     };
 
-    // 4. HELPER MENCARI TABEL DENGAN TIMEOUT
-    function waitForTable(timeoutMs = 5000) {
-        return new Promise((resolve, reject) => {
-            const startTime = Date.now();
-            const interval = setInterval(() => {
-                const table = document.querySelector('table') || document.querySelector('.ant-table-content table');
-                if (table) {
-                    clearInterval(interval);
-                    resolve(table);
-                } else if (Date.now() - startTime > timeoutMs) {
-                    clearInterval(interval);
-                    reject(new Error("Timeout: Tabel Screener tidak ditemukan setelah 5 detik."));
-                }
-            }, 300);
-        });
-    }
-
-    // 5. LOGIKA SCRAPING & AUTOMATION SCREENER (MODUL 01)
+    // 4. LOGIKA SCRAPING & AUTOMATION SCREENER (MODUL 01)
     window.runScreenerAutomation = async function(presetName) {
         const config = SCREENER_CONFIGS[presetName];
         if (!config) {
@@ -182,40 +165,57 @@
             return;
         }
 
-        // PERIKSA HALAMAN: Jika tidak berada di /screener, arahkan pengguna
         if (!window.location.href.includes('/screener')) {
-            updateLog(`Mengalihkan ke halaman Screener... Silakan jalankan kembali Bookmarklet di halaman Screener.`, 'warning');
-            setTimeout(() => {
-                window.location.href = 'https://stockbit.com/screener';
-            }, 1500);
+            updateLog(`Arahkan browser ke halaman Screener Stockbit dulu!`, 'warning');
             return;
         }
 
-        updateLog(`Mulai proses scraping untuk preset: [${presetName}]...`, 'info');
+        updateLog(`Memulai pemindaian tabel untuk preset: [${presetName}]...`, 'info');
 
         try {
-            // Sembunyikan UI sejenak untuk memindai DOM
-            document.getElementById('sb-full-dashboard').style.display = 'none';
+            // Cari elemen tabel di DOM utama maupun iframe
+            let tables = Array.from(document.querySelectorAll('table'));
+            
+            // Periksa jika tabel berada di dalam iframe
+            if (tables.length === 0) {
+                const iframes = document.querySelectorAll('iframe');
+                iframes.forEach(iframe => {
+                    try {
+                        const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                        const iframeTables = iframeDoc.querySelectorAll('table');
+                        if (iframeTables.length > 0) tables = Array.from(iframeTables);
+                    } catch (e) {
+                        // Ignore cross-origin iframe restrictions
+                    }
+                });
+            }
 
-            const tableContainer = await waitForTable(5000);
-
-            // Scraping Data Tabel
-            const rows = Array.from(tableContainer.querySelectorAll('tr'));
-            const scrapedData = [];
-            rows.forEach((row) => {
-                const cells = Array.from(row.querySelectorAll('th, td')).map(c => c.innerText.trim());
-                if (cells.length > 0) scrapedData.push(cells);
-            });
-
-            // Tampilkan kembali UI
-            document.getElementById('sb-full-dashboard').style.display = 'block';
-
-            if (scrapedData.length === 0) {
-                updateLog(`Data tabel kosong untuk preset [${presetName}].`, 'warning');
+            if (tables.length === 0) {
+                updateLog(`❌ Tabel Screener tidak ditemukan. Pastikan data saham di halaman Stockbit sudah selesai dimuat.`, 'error');
                 return;
             }
 
-            updateLog(`Data berhasil di-scrape (${scrapedData.length} baris). Mengirim ke Google Sheets...`, 'info');
+            // Ambil tabel dengan jumlah baris terbanyak
+            const targetTable = tables.reduce((prev, current) => 
+                (prev.querySelectorAll('tr').length > current.querySelectorAll('tr').length) ? prev : current
+            );
+
+            const rows = Array.from(targetTable.querySelectorAll('tr'));
+            const scrapedData = [];
+            
+            rows.forEach((row) => {
+                const cells = Array.from(row.querySelectorAll('th, td')).map(c => c.innerText.trim().replace(/\n/g, ' '));
+                if (cells.length > 0 && cells.some(text => text !== '')) {
+                    scrapedData.push(cells);
+                }
+            });
+
+            if (scrapedData.length === 0) {
+                updateLog(`⚠️ Baris tabel kosong/belum dimuat penuh oleh Stockbit.`, 'warning');
+                return;
+            }
+
+            updateLog(`⏳ Data berhasil di-scrape (${scrapedData.length} baris). Mengirim ke Google Sheets...`, 'info');
 
             // Dispatch Ke Webhook GAS
             const payload = {
@@ -232,11 +232,10 @@
                 body: JSON.stringify(payload)
             });
 
-            updateLog(`✅ Berhasil! Data [${presetName}] dikirim ke Sheet: ${config.sheet} (Kolom ${config.startCol}).`, 'info');
+            updateLog(`✅ Berhasil! ${scrapedData.length} baris data [${presetName}] dikirim ke Sheet: ${config.sheet} (Kolom ${config.startCol}).`, 'info');
 
         } catch (err) {
-            document.getElementById('sb-full-dashboard').style.display = 'block';
-            updateLog(`❌ ${err.message}`, 'error');
+            updateLog(`❌ Error: ${err.message}`, 'error');
         }
     };
 
