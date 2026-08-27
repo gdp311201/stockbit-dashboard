@@ -2,19 +2,19 @@
     // 1. MAPPING KONFIGURASI SCREENER & DELEGASI GAS
     const SCREENER_CONFIGS = {
         "FINAL BPJS - ONE DAY TRADE": {
-            targetKeywords: ["FINAL BPJS", "ONE DAY TRADE", "BPJS"],
+            targetKeywords: ["FINAL BPJS - ONE DAY TRADE", "FINAL BPJS", "ONE DAY TRADE"],
             sheet: "SC",
             startCol: "T",
             gasUrl: "https://script.google.com/macros/s/AKfycbz_GANTI_DENGAN_URL_GAS_LU/exec"
         },
         "BD SANGKUT": {
-            targetKeywords: ["BD - SANGKUT", "BD SANGKUT", "SANGKUT"],
+            targetKeywords: ["BD - SANGKUT & AKUM", "BD SANGKUT", "BD - SANGKUT"],
             sheet: "SC",
             startCol: "AA",
             gasUrl: "https://script.google.com/macros/s/AKfycbz_GANTI_DENGAN_URL_GAS_LU/exec"
         },
         "REMORA": {
-            targetKeywords: ["REMORA", "SIAP NAIK"],
+            targetKeywords: ["REMORA - SIAP NAIK CEPAT", "REMORA", "SIAP NAIK CEPAT"],
             sheet: "SC",
             startCol: "AH",
             gasUrl: "https://script.google.com/macros/s/AKfycbz_GANTI_DENGAN_URL_GAS_LU/exec"
@@ -60,7 +60,7 @@
                 <div style="display: flex; align-items: center; gap: 10px;">
                     <div style="background: #059669; padding: 6px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">⚡</div>
                     <div>
-                        <h1 style="margin: 0; font-size: 16px; font-weight: 700; color: #fff;">STOCKBIT TOOLS <span style="font-size: 11px; font-weight: normal; color: #10b981; background: rgba(16,185,129,0.15); padding: 2px 6px; border-radius: 12px; margin-left: 6px;">v5.4 Targeted Favorites Fix</span></h1>
+                        <h1 style="margin: 0; font-size: 16px; font-weight: 700; color: #fff;">STOCKBIT TOOLS <span style="font-size: 11px; font-weight: normal; color: #10b981; background: rgba(16,185,129,0.15); padding: 2px 6px; border-radius: 12px; margin-left: 6px;">v5.5 Hybrid Tab & Favorites Fix</span></h1>
                     </div>
                 </div>
                 <button onclick="document.getElementById('sb-full-dashboard').remove()" style="background: #1e293b; color: #94a3b8; border: 1px solid #334155; width: 32px; height: 32px; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#94a3b8'">✕</button>
@@ -181,63 +181,67 @@
         });
     }
 
-    // 3. AUTOMATED SCREENER EXECUTOR (TARGETED FAVORITES DROPDOWN FIX)
+    // 3. AUTOMATED SCREENER EXECUTOR (HYBRID TAB & FAVORITES)
     window.runScreenerAutomation = async function(btnKey) {
         const cfg = SCREENER_CONFIGS[btnKey];
         if (!cfg) return;
 
         try {
-            updateLog(`Mencari Dropdown Favorites untuk [${btnKey}]...`);
+            updateLog(`Mencari preset [${btnKey}]...`);
 
             const initialFirstRowText = document.querySelector('tbody.ant-table-tbody tr')?.innerText || '';
             let targetClicked = false;
 
-            // FOKUS 1: Cari Tombol/Dropdown "Favorites" khusus di area Screener
-            const favoritesBtn = Array.from(document.querySelectorAll('div, button, span')).find(el => {
-                if (el.closest('#sb-full-dashboard')) return false;
-                const txt = (el.innerText || '').trim();
-                return txt === 'Favorites' || txt.startsWith('Favorites');
-            });
+            // LANGKAH A: CARI TAB SEBAGAI TOMBOL DIRECT DULU (Tampilan Horizontal atas)
+            const allElements = Array.from(document.querySelectorAll('button, div, span, a, li'));
+            for (let el of allElements) {
+                if (el.closest('#sb-full-dashboard')) continue;
 
-            if (favoritesBtn) {
-                updateLog(`Membuka menu Favorites...`);
-                triggerFullClick(favoritesBtn);
-                await sleep(600); // Tunggu popup menu drop-down Favorites terbuka
+                const text = (el.innerText || '').trim().toUpperCase();
+                
+                // Pastikan bukan tombol dropdown Favorites
+                if (text.startsWith('FAVORITES')) continue;
 
-                // CARI ITEM PRESET DALAM MENU DROPDOWN FAVORITES YANG TERBUKA
-                const menuItems = Array.from(document.querySelectorAll('.ant-dropdown-menu-item, .ant-select-item-option, div[role="option"], li'));
-                for (let item of menuItems) {
-                    const itemText = (item.innerText || '').trim().toUpperCase();
-                    if (cfg.targetKeywords.some(kw => itemText.includes(kw.toUpperCase()))) {
-                        triggerFullClick(item);
-                        targetClicked = true;
-                        break;
+                if (cfg.targetKeywords.some(kw => text === kw.toUpperCase())) {
+                    updateLog(`Mengklik Tab Preset: ${text}...`);
+                    triggerFullClick(el);
+                    targetClicked = true;
+                    break;
+                }
+            }
+
+            // LANGKAH B: JIKA TIDAK ADA DI TAB, BUKA DROPDOWN FAVORITES
+            if (!targetClicked) {
+                const favoritesBtn = Array.from(document.querySelectorAll('div, button, span')).find(el => {
+                    if (el.closest('#sb-full-dashboard')) return false;
+                    const txt = (el.innerText || '').trim();
+                    return txt === 'Favorites' || txt.startsWith('Favorites');
+                });
+
+                if (favoritesBtn) {
+                    updateLog(`Preset tidak ada di Tab, membuka menu Favorites...`);
+                    triggerFullClick(favoritesBtn);
+                    await sleep(500);
+
+                    const menuItems = Array.from(document.querySelectorAll('.ant-dropdown-menu-item, .ant-select-item-option, div[role="option"], li'));
+                    for (let item of menuItems) {
+                        const itemText = (item.innerText || '').trim().toUpperCase();
+                        if (cfg.targetKeywords.some(kw => itemText.includes(kw.toUpperCase()))) {
+                            triggerFullClick(item);
+                            targetClicked = true;
+                            break;
+                        }
                     }
                 }
             }
 
-            // FOKUS 2 (FALLBACK): Jika preset sudah ada dalam bentuk Tab langsung di samping Preset Screener
             if (!targetClicked) {
-                const tabButtons = Array.from(document.querySelectorAll('button, div, span, a'));
-                for (let el of tabButtons) {
-                    if (el.closest('#sb-full-dashboard')) continue;
-                    const text = (el.innerText || '').trim().toUpperCase();
-                    if (cfg.targetKeywords.some(kw => text === kw.toUpperCase())) {
-                        triggerFullClick(el);
-                        targetClicked = true;
-                        break;
-                    }
-                }
-            }
-
-            if (!targetClicked) {
-                updateLog(`Gagal: Menu Favorites atau Preset "${btnKey}" tidak ditemukan. Pastikan nama preset sudah tersimpan di Favorites.`, 'error');
+                updateLog(`Gagal: Preset "${btnKey}" tidak ditemukan baik di Tab maupun Favorites.`, 'error');
                 return;
             }
 
             // WAITING LOOP: Menunggu Stockbit memperbarui data di tabel background
             updateLog(`Memuat data [${btnKey}]... Harap tunggu.`);
-            let isDataUpdated = false;
             let checkRetry = 0;
 
             while (checkRetry < 10) {
@@ -245,13 +249,12 @@
                 const currentFirstRowText = document.querySelector('tbody.ant-table-tbody tr')?.innerText || '';
                 
                 if (currentFirstRowText !== initialFirstRowText && currentFirstRowText !== '') {
-                    isDataUpdated = true;
                     break;
                 }
                 checkRetry++;
             }
 
-            await sleep(1200); // Penstabil render DOM
+            await sleep(1000); // Penstabil render DOM
 
             // SCRAPE TABEL HASIL
             const table = document.querySelector('table');
