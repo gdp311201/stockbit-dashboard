@@ -74,12 +74,14 @@
     // 2. OVERLAY UTAMA
     const overlay = document.createElement('div');
     overlay.id = 'sb-full-dashboard';
-    
+    // Style dasar (warna gelap transparan & posisi)
     overlay.style = `
         position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-        background: rgba(2, 6, 13, 0.45); backdrop-filter: blur(1.5px); -webkit-backdrop-filter: blur(8px);
+        background: rgba(2, 6, 13, 0.7);
+        backdrop-filter: blur(8px) saturate(150%); -webkit-backdrop-filter: blur(1.5px) saturate(150%);
         z-index: 999999; color: #e2e8f0; font-family: 'Inter', system-ui, -apple-system, sans-serif;
         display: flex; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box;
+        overflow: hidden;
     `;
 
     const brokerCheckboxesHTML = BROKER_CODES.map(b => `
@@ -89,8 +91,9 @@
         </label>
     `).join('');
 
+    // Tambahkan position:relative dan z-index:2 pada inner wrapper supaya selalu di atas background neon
     overlay.innerHTML = `
-        <div style="width: 100%; max-width: 1440px; max-height: 94vh; display: flex; flex-direction: column; gap: 18px; overflow-y: auto; padding-right: 4px;">
+        <div style="width: 100%; max-width: 1440px; max-height: 94vh; display: flex; flex-direction: column; gap: 18px; overflow-y: auto; padding-right: 4px; position: relative; z-index: 2;">
             
             <!-- HEADER -->
             <div class="floating-bubble-card" style="padding: 16px 24px; display: flex; justify-content: space-between; align-items: center;">
@@ -338,16 +341,50 @@
 
     document.body.appendChild(overlay);
 
-    // 3. STYLING CSS
+    // 3. STYLING CSS (BACKGROUND NEON MOTION & KOMPONEN UI)
     const style = document.createElement('style');
     style.innerHTML = `
         .floating-bubble-card {
-            background: rgba(10, 16, 28, 0.65);
+            background: rgba(10, 16, 28, 0.75);
             backdrop-filter: blur(14px);
             -webkit-backdrop-filter: blur(14px);
             border-radius: 18px;
             border: 1px solid rgba(255, 255, 255, 0.08);
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+            position: relative;
+            z-index: 2;
+        }
+        
+        /* BACKGROUND GRID CHART TEMA STOCK */
+        #sb-full-dashboard::before {
+            content: "";
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: 
+                linear-gradient(rgba(56, 189, 248, 0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(56, 189, 248, 0.04) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: 0;
+            pointer-events: none;
+        }
+        
+        /* BACKGROUND ORBS NEON MOTION */
+        #sb-full-dashboard::after {
+            content: "";
+            position: absolute; top: -20%; left: -20%; width: 140%; height: 140%;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(16, 185, 129, 0.18), transparent 35%),
+                radial-gradient(circle at 80% 70%, rgba(56, 189, 248, 0.18), transparent 35%),
+                radial-gradient(circle at 50% 50%, rgba(245, 158, 11, 0.05), transparent 50%);
+            filter: blur(60px);
+            z-index: 0;
+            pointer-events: none;
+            animation: sbNeonMotion 20s ease-in-out infinite alternate;
+        }
+        
+        @keyframes sbNeonMotion {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(10%, -10%) scale(1.1); }
+            100% { transform: translate(-5%, 5%) scale(0.95); }
         }
         
         .dash-input-trans { 
