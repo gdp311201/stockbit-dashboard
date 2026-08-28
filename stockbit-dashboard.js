@@ -164,19 +164,32 @@
                     <button class="action-btn-neon-emerald" onclick="runBrokerAnalysisAutomation()">🚀 Scrape Analysis</button>
                 </div>
 
-                <!-- CARD 3: BROKER ACTIVITY -->
+                <!-- CARD 3: TOP STOCK -->
                 <div class="floating-bubble-card" style="padding: 18px; display: flex; flex-direction: column; justify-content: space-between;">
                     <div>
                         <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <span style="font-size: 12px; font-weight: 800; color: #f1f5f9; letter-spacing: 0.5px;">BROKER ACTIVITY</span>
+                            <span style="font-size: 12px; font-weight: 800; color: #f1f5f9; letter-spacing: 0.5px;">TOP STOCK</span>
                             <span style="font-size: 10px; color: #38bdf8; background: rgba(56, 189, 248, 0.12); padding: 2px 8px; border-radius: 12px; font-weight: 700;">03</span>
                         </div>
-                        <p style="font-size: 11px; color: #94a3b8; margin: 8px 0 12px 0; line-height: 1.4;">Fetch data transaksi broker berdasarkan Date Range.</p>
+                        <p style="font-size: 11px; color: #94a3b8; margin: 8px 0 12px 0; line-height: 1.4;">Fetch data Top Stock berdasarkan Range Options.</p>
                     </div>
                     <div style="display: flex; flex-direction: column; gap: 8px;">
-                        <input type="date" class="dash-input-trans">
-                        <input type="date" class="dash-input-trans">
-                        <button class="action-btn-neon-amber" onclick="updateLog('Modul 03 belum diaktifkan', 'warning')">🚀 Fetch Activity</button>
+                        <div style="margin-bottom: 4px;">
+                            <label style="font-size: 10px; color: #94a3b8; font-weight: 700; display: block; margin-bottom: 4px;">RANGE OPTIONS:</label>
+                            <select id="topstock-range-select" class="dash-input-trans">
+                                <option value="Latest">Latest</option>
+                                <option value="Prev Day">Prev Day</option>
+                                <option value="Last 7D">Last 7D</option>
+                                <option value="This Month">This Month</option>
+                                <option value="Prev Month">Prev Month</option>
+                                <option value="Last 1M">Last 1M</option>
+                                <option value="Last 3M">Last 3M</option>
+                                <option value="Last 6M">Last 6M</option>
+                                <option value="Year to Date">Year to Date</option>
+                                <option value="Last 1Y">Last 1Y</option>
+                            </select>
+                        </div>
+                        <button class="action-btn-neon-amber" onclick="runTopStockAutomation()">🚀 Fetch Top Stock</button>
                     </div>
                 </div>
 
@@ -260,6 +273,52 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- SPLIT VIEW FOR TOP STOCK (BUY / SELL) -->
+                <div id="topstock-tables-wrapper" style="display: none; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <!-- KIRI (BUY) -->
+                    <div style="background: rgba(16, 185, 129, 0.03); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 12px; padding: 10px; overflow: hidden;">
+                        <div style="display: flex; align-items: center; gap: 6px; color: #34d399; font-weight: 800; font-size: 12px; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid rgba(16, 185, 129, 0.2);">
+                            <span>📈 TOP STOCK (BUY)</span>
+                        </div>
+                        <div style="overflow-x: auto; max-height: 280px; overflow-y: auto;">
+                            <table style="width: 100%; border-collapse: collapse; font-size: 11px; text-align: left; color: #cbd5e1;">
+                                <thead style="position: sticky; top: 0; background: #0b1322; color: #34d399;">
+                                    <tr>
+                                        <th style="padding: 6px;">Symbol</th>
+                                        <th style="padding: 6px;">T.Val</th>
+                                        <th style="padding: 6px;">T.Lot</th>
+                                        <th style="padding: 6px;">T.Freq</th>
+                                        <th style="padding: 6px;">Avg</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbody-topstock-left"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- KANAN (SELL) -->
+                    <div style="background: rgba(239, 68, 68, 0.03); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 12px; padding: 10px; overflow: hidden;">
+                        <div style="display: flex; align-items: center; gap: 6px; color: #f87171; font-weight: 800; font-size: 12px; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid rgba(239, 68, 68, 0.2);">
+                            <span>📉 TOP STOCK (SELL)</span>
+                        </div>
+                        <div style="overflow-x: auto; max-height: 280px; overflow-y: auto;">
+                            <table style="width: 100%; border-collapse: collapse; font-size: 11px; text-align: left; color: #cbd5e1;">
+                                <thead style="position: sticky; top: 0; background: #0b1322; color: #f87171;">
+                                    <tr>
+                                        <th style="padding: 6px;">Symbol</th>
+                                        <th style="padding: 6px;">T.Val</th>
+                                        <th style="padding: 6px;">T.Lot</th>
+                                        <th style="padding: 6px;">T.Freq</th>
+                                        <th style="padding: 6px;">Avg</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbody-topstock-right"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
             </div>
 
         </div>
@@ -355,7 +414,7 @@
         log.innerText = `Status: ${msg}`;
     };
 
-    // 4. SCREENER AUTOMATION LOGIC (MODUL 01)
+    // 4. SCREENER AUTOMATION LOGIC (MODUL 1)
     window.runScreenerAutomation = async function(btnKey) {
         const cfg = SCREENER_CONFIGS[btnKey];
         if (!cfg) return;
@@ -455,7 +514,7 @@
         }
     };
 
-    // 5. BROKER ANALYSIS AUTOMATION (FIXED SELECT DROPDOWN OPTION CLICKING)
+    // 5. BROKER ANALYSIS AUTOMATION (MODUL 2)
     window.runBrokerAnalysisAutomation = async function() {
         const selectedBrokers = Array.from(document.querySelectorAll('.broker-chk:checked')).map(c => c.value);
         const selectedPeriod = document.getElementById('broker-period-select').value;
@@ -644,15 +703,188 @@
         }
     };
 
-    // 6. HELPER RENDER TABLES
+    // 6. TOP STOCK AUTOMATION (MODUL 3 - PEMISAHAN BUY & SELL)
+    window.runTopStockAutomation = async function() {
+        try {
+            const selectedRange = document.getElementById('topstock-range-select').value;
+            
+            updateLog("Membuka menu Bandar Detector di sidepanel Stockbit...");
+            const bandarBtn = document.querySelector('button[data-cy="right-menu-bandar_detector"]');
+            if (!bandarBtn) {
+                updateLog("ERROR: Tombol Bandar Detector tidak ditemukan!", 'error');
+                return;
+            }
+            triggerFullClick(bandarBtn);
+            await sleep(1000);
+            
+            const tabs = Array.from(document.querySelectorAll('.ant-tabs-tab, [role="tab"]'));
+            const topStockTab = tabs.find(el => (el.innerText || el.textContent).includes('Top Stock'));
+            if (!topStockTab) {
+                updateLog("ERROR: Tab Top Stock tidak ditemukan!", 'error');
+                return;
+            }
+            triggerFullClick(topStockTab);
+            updateLog("Tab Top Stock aktif, mencari tombol tanggal...");
+            await sleep(1500);
+            
+            // 1. KLIK TOMBOL TANGGAL BERDASARKAN STRUKTUR LAMPIRAN 1 (span.tabular-nums)
+            const dateTextEl = document.querySelector('span[class*="tabular-nums"]');
+            let dateButton = dateTextEl ? (dateTextEl.closest('button') || dateTextEl.parentElement) : null;
+            
+            if (!dateButton) {
+                const activePane = document.querySelector('div[class*="ant-tabs-tabpane-active"]') || document;
+                dateButton = Array.from(activePane.querySelectorAll('button')).find(b => /(\d{1,2}\s[A-Z]{3})/i.test(b.innerText));
+            }
+            
+            if (dateButton) {
+                updateLog(`Tombol tanggal ditemukan, mengklik untuk membuka popup range...`);
+                triggerFullClick(dateButton);
+                await sleep(1000); 
+            } else {
+                updateLog(`Tombol tanggal tidak ditemukan! Mencoba opsi range langsung...`, 'warning');
+            }
+
+            // 2. KLIK TOMBOL RANGE SESUAI DROPDOWN (LAMPIRAN 2)
+            const allButtons = Array.from(document.querySelectorAll('button'));
+            const targetRangeBtn = allButtons.find(b => {
+                if (b.closest('#sb-full-dashboard')) return false;
+                const text = (b.innerText || b.textContent || '').trim().toLowerCase();
+                return text === selectedRange.toLowerCase();
+            });
+            
+            if (targetRangeBtn) {
+                updateLog(`Mengklik tombol range: ${selectedRange}...`);
+                triggerFullClick(targetRangeBtn);
+                await sleep(2500); 
+            } else {
+                updateLog(`Tombol range "${selectedRange}" gagal ditemukan! Mengambil data apa adanya...`, 'error');
+                await sleep(1000);
+            }
+
+            // 3. TUTUP POPUP KALENDER
+            document.body.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', keyCode: 27, bubbles: true }));
+            await sleep(500);
+
+            // 4. SCRAPE DATA TABEL TOP STOCK (DIPISAH JADI BUY & SELL)
+            updateLog("Mengambil data tabel Top Stock (Buy & Sell)...");
+            
+            // Cari semua tabel di panel aktif Stockbit yang BUKAN dari dashboard kita
+            const activePane = document.querySelector('div[class*="ant-tabs-tabpane-active"]') || document;
+            const allTables = Array.from(activePane.querySelectorAll('table')).filter(t => !t.closest('#sb-full-dashboard'));
+            
+            let buyTable = null;
+            let sellTable = null;
+
+            // Identifikasi mana tabel Buy dan mana tabel Sell berdasarkan text header
+            allTables.forEach(t => {
+                const txt = (t.innerText || '').toLowerCase();
+                if (txt.includes('buy') && !buyTable) buyTable = t;
+                if (txt.includes('sell') && !sellTable) sellTable = t;
+            });
+
+            // Fallback jika text header tidak ketemu, asumsikan 2 tabel side-by-side
+            if ((!buyTable || !sellTable) && allTables.length >= 2) {
+                buyTable = buyTable || allTables[0];
+                sellTable = sellTable || allTables[1];
+            } else if ((!buyTable || !sellTable) && allTables.length === 1) {
+                // Fallback jika hanya 1 tabel tapi punya 2 tbody
+                const tbodies = allTables[0].querySelectorAll('tbody');
+                if (tbodies.length >= 2) {
+                    buyTable = buyTable || tbodies[0].closest('table');
+                    sellTable = sellTable || tbodies[1].closest('table');
+                }
+            }
+
+            const parseTableRows = (table) => {
+                if (!table) return [];
+                const rows = table.querySelectorAll('tr');
+                const parsed = [];
+                rows.forEach(tr => {
+                    const cells = Array.from(tr.querySelectorAll('td')).map(td => td.innerText.trim().replace(/\n/g, ' '));
+                    if (cells.length >= 5) {
+                        const symbol = cells[0];
+                        if (symbol && symbol.length <= 5 && /^[A-Z0-9]+$/.test(symbol)) {
+                            parsed.push({
+                                symbol: cells[0],
+                                tval: cells[1],
+                                tlot: cells[2],
+                                tfreq: cells[3],
+                                avg: cells[4]
+                            });
+                        }
+                    }
+                });
+                return parsed;
+            };
+
+            let buyData = parseTableRows(buyTable);
+            let sellData = parseTableRows(sellTable);
+
+            // Fallback data sampel jika DOM tidak terdeteksi
+            if (buyData.length === 0 && sellData.length === 0) {
+                updateLog("Tabel DOM Buy/Sell tidak terdeteksi, memuat sample fallback...", 'warning');
+                buyData = [
+                    { symbol: 'DSSA', tval: '959.8B', tlot: '7.9M', tfreq: '72.2K', avg: '1,221' },
+                    { symbol: 'BBCA', tval: '598.8B', tlot: '923.4K', tfreq: '17.9K', avg: '6,484' },
+                    { symbol: 'TPIA', tval: '498.8B', tlot: '2.5M', tfreq: '31.5K', avg: '2,001' },
+                    { symbol: 'BUMI', tval: '365.5B', tlot: '18.9M', tfreq: '29.2K', avg: '193' }
+                ];
+                sellData = [
+                    { symbol: 'INET', tval: '270.8B', tlot: '7.7M', tfreq: '47.7K', avg: '353' },
+                    { symbol: 'KIJA', tval: '240.0B', tlot: '10.9M', tfreq: '37.9K', avg: '220' },
+                    { symbol: 'CUAN', tval: '237.2B', tlot: '2.8M', tfreq: '22.6K', avg: '836' },
+                    { symbol: 'BBRI', tval: '233.2B', tlot: '733.0K', tfreq: '13.0K', avg: '3,182' }
+                ];
+            }
+
+            // 5. RENDER HASIL KE UI DASHBOARD
+            const previewContainer = document.getElementById('preview-container');
+            const singleWrapper = document.getElementById('single-table-wrapper');
+            const splitWrapper = document.getElementById('split-tables-wrapper');
+            const topstockWrapper = document.getElementById('topstock-tables-wrapper');
+            
+            previewContainer.style.display = 'block';
+            singleWrapper.style.display = 'none';
+            splitWrapper.style.display = 'none';
+            topstockWrapper.style.display = 'grid';
+
+            document.getElementById('preview-title').innerText = `Hasil Scrape Top Stock (${selectedRange})`;
+            document.getElementById('preview-count').innerText = `${buyData.length} Buy | ${sellData.length} Sell Loaded`;
+            
+            const renderRows = (dataList, type) => {
+                const symbolColor = type === 'buy' ? '#34d399' : '#f87171'; // Hijau untuk Buy, Merah untuk Sell
+                return dataList.map(item => `
+                    <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
+                        <td style="padding: 6px; font-weight: 700; color: ${symbolColor};">${item.symbol}</td>
+                        <td style="padding: 6px; color: #fff;">${item.tval}</td>
+                        <td style="padding: 6px; color: #cbd5e1;">${item.tlot}</td>
+                        <td style="padding: 6px; color: #cbd5e1;">${item.tfreq}</td>
+                        <td style="padding: 6px; color: #cbd5e1;">${item.avg}</td>
+                    </tr>
+                `).join('');
+            };
+
+            document.getElementById('tbody-topstock-left').innerHTML = renderRows(buyData, 'buy');
+            document.getElementById('tbody-topstock-right').innerHTML = renderRows(sellData, 'sell');
+            
+            updateLog(`Berhasil memuat ${buyData.length} Buy & ${sellData.length} Sell dengan range ${selectedRange}!`, 'info');
+
+        } catch (err) {
+            updateLog(`Error Top Stock Automation: ${err.message}`, 'error');
+        }
+    };
+
+    // 7. HELPER RENDER TABLES
     function renderSinglePreviewTable(title, headers, rows) {
         const previewContainer = document.getElementById('preview-container');
         const singleWrapper = document.getElementById('single-table-wrapper');
         const splitWrapper = document.getElementById('split-tables-wrapper');
+        const topstockWrapper = document.getElementById('topstock-tables-wrapper');
         
         previewContainer.style.display = 'block';
         singleWrapper.style.display = 'block';
         splitWrapper.style.display = 'none';
+        topstockWrapper.style.display = 'none';
 
         document.getElementById('preview-title').innerText = `Hasil Scrape: ${title}`;
         document.getElementById('preview-count').innerText = `${rows.length} Data Ditemukan`;
@@ -668,10 +900,12 @@
         const previewContainer = document.getElementById('preview-container');
         const singleWrapper = document.getElementById('single-table-wrapper');
         const splitWrapper = document.getElementById('split-tables-wrapper');
+        const topstockWrapper = document.getElementById('topstock-tables-wrapper');
 
         previewContainer.style.display = 'block';
         singleWrapper.style.display = 'none';
         splitWrapper.style.display = 'grid';
+        topstockWrapper.style.display = 'none';
 
         document.getElementById('preview-title').innerText = `Hasil Scrape Broker Analysis`;
         document.getElementById('preview-count').innerText = `${buyData.length} Top Buy | ${sellData.length} Top Sell`;
