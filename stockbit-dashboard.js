@@ -21,7 +21,7 @@
             id: "14ryEGNhvwm9XCuw-lo6tSfwDqRmGAK_ZlUpuKd0Pm8M",
             sheet: "SC",
             startCol: "T",
-            gasUrl: "https://script.google.com/macros/s/AKfycbxBmt9PR_jW3CwiiOKrel_clbUCTWGC2Br3ocvANT1pnrvqoqUr4HSuHNRhEYZZ0k7GHA/exec"
+            gasUrl: "https://script.google.com/macros/s/AKfycby867iVRm0RlVnipq4obh9vaxfzy6nyIJ9DkENATabCCb4Af8G4ylQvxcWPgJWpg3OnRw/exec"
         },
         "BD SANGKUT": {
             targetKeywords: ["BD - SANGKUT & AKUM", "BD SANGKUT", "BD - SANGKUT"],
@@ -75,81 +75,85 @@
     const overlay = document.createElement('div');
     overlay.id = 'sb-full-dashboard';
     
+    // Lebar diperbesar 1.5x lipat dari 960px menjadi 1440px
     overlay.style = `
         position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-        background: rgba(2, 6, 13, 0.45); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(8px);
+        background: rgba(2, 6, 13, 0.45); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(2px);
         z-index: 999999; color: #e2e8f0; font-family: 'Inter', system-ui, -apple-system, sans-serif;
         display: flex; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box;
     `;
 
     const brokerCheckboxesHTML = BROKER_CODES.map(b => `
-        <label style="display: flex; align-items: center; gap: 4px; font-size: 11px; background: rgba(255,255,255,0.04); padding: 4px 8px; border-radius: 6px; cursor: pointer;" title="${BROKER_MAP[b]}">
-            <input type="checkbox" value="${b}" class="broker-chk" style="accent-color: #10b981; cursor: pointer;">
+        <label style="display: flex; align-items: center; gap: 5px; font-size: 15px; background: rgba(56, 189, 248, 0.05); padding: 6px 10px; border-radius: 6px; cursor: pointer; border: 1px solid rgba(56, 189, 248, 0.1);" title="${BROKER_MAP[b]}">
+            <input type="checkbox" value="${b}" class="broker-chk" style="accent-color: #38bdf8; cursor: pointer; width: 16px; height: 16px;">
             ${b}
         </label>
     `).join('');
 
     overlay.innerHTML = `
-        <div style="width: 100%; max-width: 960px; max-height: 94vh; display: flex; flex-direction: column; gap: 16px; overflow-y: auto; padding-right: 4px;">
+        <div style="width: 100%; max-width: 1440px; max-height: 94vh; display: flex; flex-direction: column; gap: 18px; overflow-y: auto; padding-right: 4px;">
             
             <!-- HEADER -->
-            <div class="floating-bubble-card" style="padding: 14px 20px; display: flex; justify-content: space-between; align-items: center;">
-                <div style="display: flex; align-items: center; gap: 12px;">
-                    <div style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); width: 38px; height: 38px; border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 15px rgba(16, 185, 129, 0.15);">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <div class="floating-bubble-card" style="padding: 16px 24px; display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; align-items: center; gap: 14px;">
+                    <div style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 15px rgba(16, 185, 129, 0.15);">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                             <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
                         </svg>
                     </div>
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <h1 style="margin: 0; font-size: 16px; font-weight: 800; color: #fff; letter-spacing: 0.5px;">STOCKBIT<span style="color: #10b981;">TOOLS</span></h1>
-                        <span style="font-size: 11px; font-weight: 600; color: #38bdf8; background: rgba(56, 189, 248, 0.12); border: 1px solid rgba(56, 189, 248, 0.25); padding: 3px 12px; border-radius: 20px; letter-spacing: 0.3px;">by Julyo Sechar</span>
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <h1 style="margin: 0; font-size: 20px; font-weight: 800; color: #fff; letter-spacing: 0.5px;">STOCKBIT<span style="color: #10b981;">TOOLS</span></h1>
+                        <span style="font-size: 15px; font-weight: 600; color: #38bdf8; background: rgba(56, 189, 248, 0.12); border: 1px solid rgba(56, 189, 248, 0.25); padding: 4px 14px; border-radius: 20px; letter-spacing: 0.3px;">by Julyo Sechar</span>
                     </div>
                 </div>
-                <button onclick="document.getElementById('sb-full-dashboard').remove()" style="background: rgba(239, 68, 68, 0.12); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); padding: 6px 16px; border-radius: 20px; font-weight: 700; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.2s;" onmouseover="this.style.background='rgba(239, 68, 68, 0.25)';" onmouseout="this.style.background='rgba(239, 68, 68, 0.12)';">
+                <button onclick="document.getElementById('sb-full-dashboard').remove()" style="background: rgba(239, 68, 68, 0.12); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); padding: 8px 18px; border-radius: 20px; font-weight: 700; font-size: 16px; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.2s;" onmouseover="this.style.background='rgba(239, 68, 68, 0.25)';" onmouseout="this.style.background='rgba(239, 68, 68, 0.12)';">
                     ⏻ Keluar
                 </button>
             </div>
 
             <!-- CARDS GRID -->
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 18px;">
                 
-                <!-- CARD 1: SCREENER AUTOMATION -->
-                <div class="floating-bubble-card" style="padding: 18px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <span style="font-size: 12px; font-weight: 800; color: #f1f5f9; letter-spacing: 0.5px;">SCREENER AUTOMATION</span>
-                        <span style="font-size: 10px; color: #38bdf8; background: rgba(56, 189, 248, 0.12); padding: 2px 8px; border-radius: 12px; font-weight: 700;">01</span>
+                <!-- CARD 1: SCREENER AUTOMATION (DROPDOWN) -->
+                <div class="floating-bubble-card" style="padding: 22px; display: flex; flex-direction: column; justify-content: space-between;">
+                    <div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <span style="font-size: 16px; font-weight: 800; color: #f1f5f9; letter-spacing: 0.5px;">SCREENER AUTOMATION</span>
+                            <span style="font-size: 14px; color: #38bdf8; background: rgba(56, 189, 248, 0.12); padding: 3px 10px; border-radius: 12px; font-weight: 700;">01</span>
+                        </div>
+                        <p style="font-size: 15px; color: #94a3b8; margin: 8px 0 14px 0; line-height: 1.4;">Pilih preset screener untuk memuat data secara otomatis.</p>
+                        <div style="margin-bottom: 14px;">
+                            <label style="font-size: 14px; color: #94a3b8; font-weight: 700; display: block; margin-bottom: 6px;">PILIH PRESET:</label>
+                            <select id="screener-preset-select" class="dash-input-trans">
+                                <option value="FINAL BPJS - ONE DAY TRADE">🔥 FINAL BPJS</option>
+                                <option value="BD SANGKUT">⚡ BD SANGKUT</option>
+                                <option value="REMORA">🦈 REMORA</option>
+                                <option value="SIDEWAYS 1">📈 SIDEWAYS 1</option>
+                                <option value="SIDEWAYS 2">📉 SIDEWAYS 2</option>
+                            </select>
+                        </div>
                     </div>
-                    <p style="font-size: 11px; color: #94a3b8; margin: 8px 0 12px 0; line-height: 1.4;">Pilih preset screener untuk memuat data secara otomatis.</p>
-                    <div style="display: flex; flex-direction: column; gap: 7px;">
-                        <button class="action-btn" onclick="runScreenerAutomation('FINAL BPJS - ONE DAY TRADE')">🔥 FINAL BPJS</button>
-                        <button class="action-btn" onclick="runScreenerAutomation('BD SANGKUT')">⚡ BD SANGKUT</button>
-                        <button class="action-btn" onclick="runScreenerAutomation('REMORA')">🦈 REMORA</button>
-                        <button class="action-btn" onclick="runScreenerAutomation('SIDEWAYS 1')">📈 SIDEWAYS 1</button>
-                        <button class="action-btn" onclick="runScreenerAutomation('SIDEWAYS 2')">📉 SIDEWAYS 2</button>
-                    </div>
+                    <button class="action-btn-neon-blue" onclick="runScreenerFromDropdown()">🚀 Scrape Screener</button>
                 </div>
 
                 <!-- CARD 2: BROKER ANALYSIS -->
-                <div class="floating-bubble-card" style="padding: 18px; display: flex; flex-direction: column; justify-content: space-between;">
+                <div class="floating-bubble-card" style="padding: 22px; display: flex; flex-direction: column; justify-content: space-between;">
                     <div>
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <span style="font-size: 12px; font-weight: 800; color: #f1f5f9; letter-spacing: 0.5px;">BROKER ANALYSIS</span>
-                            <span style="font-size: 10px; color: #38bdf8; background: rgba(56, 189, 248, 0.12); padding: 2px 8px; border-radius: 12px; font-weight: 700;">02</span>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <span style="font-size: 16px; font-weight: 800; color: #f1f5f9; letter-spacing: 0.5px;">BROKER ANALYSIS</span>
+                            <span style="font-size: 14px; color: #38bdf8; background: rgba(56, 189, 248, 0.12); padding: 3px 10px; border-radius: 12px; font-weight: 700;">02</span>
                         </div>
-                        <p style="font-size: 11px; color: #94a3b8; margin: 8px 0 10px 0; line-height: 1.4;">Pilih Broker & Periode untuk memuat Top Buy/Sell.</p>
+                        <p style="font-size: 15px; color: #94a3b8; margin: 8px 0 12px 0; line-height: 1.4;">Pilih Broker & Periode untuk memuat Top Buy/Sell.</p>
                         
-                        <div style="margin-bottom: 10px;">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-                                <label style="font-size: 10px; color: #94a3b8; font-weight: 700;">PILIH BROKER:</label>
-                                <a href="javascript:void(0)" onclick="toggleAllBrokers(true)" style="font-size: 10px; color: #10b981; text-decoration: none;">Pilih Semua</a>
-                            </div>
-                            <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; max-height: 80px; overflow-y: auto; padding: 4px; background: rgba(5, 10, 20, 0.4); border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
+                        <div style="margin-bottom: 12px;">
+                            <label style="font-size: 14px; color: #94a3b8; font-weight: 700; display: block; margin-bottom: 6px;">PILIH BROKER:</label>
+                            <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; max-height: 100px; overflow-y: auto; padding: 6px; background: rgba(5, 10, 20, 0.4); border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
                                 ${brokerCheckboxesHTML}
                             </div>
                         </div>
 
-                        <div style="margin-bottom: 12px;">
-                            <label style="font-size: 10px; color: #94a3b8; font-weight: 700; display: block; margin-bottom: 4px;">PERIODE:</label>
+                        <div style="margin-bottom: 14px;">
+                            <label style="font-size: 14px; color: #94a3b8; font-weight: 700; display: block; margin-bottom: 6px;">PERIODE:</label>
                             <select id="broker-period-select" class="dash-input-trans">
                                 <option value="1D">1 Hari (1D)</option>
                                 <option value="1W">1 Minggu (1W)</option>
@@ -165,17 +169,15 @@
                 </div>
 
                 <!-- CARD 3: TOP STOCK -->
-                <div class="floating-bubble-card" style="padding: 18px; display: flex; flex-direction: column; justify-content: space-between;">
+                <div class="floating-bubble-card" style="padding: 22px; display: flex; flex-direction: column; justify-content: space-between;">
                     <div>
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <span style="font-size: 12px; font-weight: 800; color: #f1f5f9; letter-spacing: 0.5px;">TOP STOCK</span>
-                            <span style="font-size: 10px; color: #38bdf8; background: rgba(56, 189, 248, 0.12); padding: 2px 8px; border-radius: 12px; font-weight: 700;">03</span>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <span style="font-size: 16px; font-weight: 800; color: #f1f5f9; letter-spacing: 0.5px;">TOP STOCK</span>
+                            <span style="font-size: 14px; color: #38bdf8; background: rgba(56, 189, 248, 0.12); padding: 3px 10px; border-radius: 12px; font-weight: 700;">03</span>
                         </div>
-                        <p style="font-size: 11px; color: #94a3b8; margin: 8px 0 12px 0; line-height: 1.4;">Fetch data Top Stock berdasarkan Range Options.</p>
-                    </div>
-                    <div style="display: flex; flex-direction: column; gap: 8px;">
-                        <div style="margin-bottom: 4px;">
-                            <label style="font-size: 10px; color: #94a3b8; font-weight: 700; display: block; margin-bottom: 4px;">RANGE OPTIONS:</label>
+                        <p style="font-size: 15px; color: #94a3b8; margin: 8px 0 14px 0; line-height: 1.4;">Fetch data Top Stock berdasarkan Range Options.</p>
+                        <div style="margin-bottom: 14px;">
+                            <label style="font-size: 14px; color: #94a3b8; font-weight: 700; display: block; margin-bottom: 6px;">RANGE OPTIONS:</label>
                             <select id="topstock-range-select" class="dash-input-trans">
                                 <option value="Latest">Latest</option>
                                 <option value="Prev Day">Prev Day</option>
@@ -189,61 +191,61 @@
                                 <option value="Last 1Y">Last 1Y</option>
                             </select>
                         </div>
-                        <button class="action-btn-neon-amber" onclick="runTopStockAutomation()">🚀 Fetch Top Stock</button>
                     </div>
+                    <button class="action-btn-neon-amber" onclick="runTopStockAutomation()">🚀 Fetch Top Stock</button>
                 </div>
 
             </div>
 
             <!-- STATUS LOG BUBBLE -->
-            <div id="dash-log" class="floating-bubble-card" style="padding: 12px 18px; color: #10b981; font-size: 12px; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.2px;">
+            <div id="dash-log" class="floating-bubble-card" style="padding: 14px 22px; color: #10b981; font-size: 16px; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.2px;">
                 Status: Siap dijalankan.
             </div>
 
             <!-- PREVIEW CONTAINER SPLIT VIEW -->
-            <div id="preview-container" class="floating-bubble-card" style="padding: 18px; display: none;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); flex-wrap: wrap; gap: 10px;">
+            <div id="preview-container" class="floating-bubble-card" style="padding: 22px; display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); flex-wrap: wrap; gap: 12px;">
                     <div>
-                        <h3 id="preview-title" style="margin: 0; color: #fff; font-size: 14px; font-weight: 700;">Hasil Scrape</h3>
-                        <span id="preview-count" style="font-size: 11px; color: #94a3b8;">0 Data Ditemukan</span>
+                        <h3 id="preview-title" style="margin: 0; color: #fff; font-size: 18px; font-weight: 700;">Hasil Scrape</h3>
+                        <span id="preview-count" style="font-size: 15px; color: #94a3b8;">0 Data Ditemukan</span>
                     </div>
 
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <div style="display: flex; align-items: center; gap: 6px;">
-                            <label style="font-size: 11px; color: #94a3b8; font-weight: 600;">Tanggal:</label>
-                            <input type="date" id="export-date" value="${todayIso}" class="dash-input-trans" style="padding: 5px 10px; width: auto;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <label style="font-size: 15px; color: #94a3b8; font-weight: 600;">Tanggal:</label>
+                            <input type="date" id="export-date" value="${todayIso}" class="dash-input-trans" style="padding: 6px 12px; width: auto;">
                         </div>
-                        <button id="btn-export" onclick="exportDataToGAS()" class="action-btn-neon-emerald" style="width: auto; padding: 8px 18px;">
+                        <button id="btn-export" onclick="exportDataToGAS()" class="action-btn-neon-emerald" style="width: auto; padding: 10px 22px;">
                             EXPORT TO GSHEETS
                         </button>
                     </div>
                 </div>
 
                 <!-- SINGLE TABLE VIEW FOR SCREENER AUTOMATION -->
-                <div id="single-table-wrapper" style="display: none; overflow-x: auto; max-height: 320px; overflow-y: auto;">
-                    <table id="preview-table-single" style="width: 100%; border-collapse: collapse; font-size: 12px; text-align: left; color: #cbd5e1;">
+                <div id="single-table-wrapper" style="display: none; overflow-x: auto; max-height: 400px; overflow-y: auto;">
+                    <table id="preview-table-single" style="width: 100%; border-collapse: collapse; font-size: 16px; text-align: left; color: #cbd5e1;">
                         <thead id="preview-thead-single" style="position: sticky; top: 0; background: rgba(15, 23, 42, 0.95); color: #10b981; z-index: 2;"></thead>
                         <tbody id="preview-tbody-single"></tbody>
                     </table>
                 </div>
 
                 <!-- SPLIT VIEW FOR BROKER ANALYSIS -->
-                <div id="split-tables-wrapper" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div id="split-tables-wrapper" style="display: grid; grid-template-columns: 1fr 1fr; gap: 18px;">
                     <!-- TOP BUY -->
-                    <div style="background: rgba(16, 185, 129, 0.03); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 12px; padding: 10px; overflow: hidden;">
-                        <div style="display: flex; align-items: center; gap: 6px; color: #34d399; font-weight: 800; font-size: 12px; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid rgba(16, 185, 129, 0.2);">
+                    <div style="background: rgba(16, 185, 129, 0.03); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 12px; padding: 12px; overflow: hidden;">
+                        <div style="display: flex; align-items: center; gap: 8px; color: #34d399; font-weight: 800; font-size: 16px; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid rgba(16, 185, 129, 0.2);">
                             <span>↗ TOP BUY</span>
                         </div>
-                        <div style="overflow-x: auto; max-height: 280px; overflow-y: auto;">
-                            <table style="width: 100%; border-collapse: collapse; font-size: 11px; text-align: left; color: #cbd5e1;">
+                        <div style="overflow-x: auto; max-height: 350px; overflow-y: auto;">
+                            <table style="width: 100%; border-collapse: collapse; font-size: 15px; text-align: left; color: #cbd5e1;">
                                 <thead style="position: sticky; top: 0; background: #0b1322; color: #34d399;">
                                     <tr>
-                                        <th style="padding: 6px;">Broker</th>
-                                        <th style="padding: 6px;">Symbol</th>
-                                        <th style="padding: 6px;">B.Val</th>
-                                        <th style="padding: 6px;">B.Lot</th>
-                                        <th style="padding: 6px;">B.Freq</th>
-                                        <th style="padding: 6px;">B.Avg</th>
+                                        <th style="padding: 8px;">Broker</th>
+                                        <th style="padding: 8px;">Symbol</th>
+                                        <th style="padding: 8px;">B.Val</th>
+                                        <th style="padding: 8px;">B.Lot</th>
+                                        <th style="padding: 8px;">B.Freq</th>
+                                        <th style="padding: 8px;">B.Avg</th>
                                     </tr>
                                 </thead>
                                 <tbody id="tbody-top-buy"></tbody>
@@ -252,20 +254,20 @@
                     </div>
 
                     <!-- TOP SELL -->
-                    <div style="background: rgba(239, 68, 68, 0.03); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 12px; padding: 10px; overflow: hidden;">
-                        <div style="display: flex; align-items: center; gap: 6px; color: #f87171; font-weight: 800; font-size: 12px; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid rgba(239, 68, 68, 0.2);">
+                    <div style="background: rgba(239, 68, 68, 0.03); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 12px; padding: 12px; overflow: hidden;">
+                        <div style="display: flex; align-items: center; gap: 8px; color: #f87171; font-weight: 800; font-size: 16px; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid rgba(239, 68, 68, 0.2);">
                             <span>↘ TOP SELL</span>
                         </div>
-                        <div style="overflow-x: auto; max-height: 280px; overflow-y: auto;">
-                            <table style="width: 100%; border-collapse: collapse; font-size: 11px; text-align: left; color: #cbd5e1;">
+                        <div style="overflow-x: auto; max-height: 350px; overflow-y: auto;">
+                            <table style="width: 100%; border-collapse: collapse; font-size: 15px; text-align: left; color: #cbd5e1;">
                                 <thead style="position: sticky; top: 0; background: #0b1322; color: #f87171;">
                                     <tr>
-                                        <th style="padding: 6px;">Broker</th>
-                                        <th style="padding: 6px;">Symbol</th>
-                                        <th style="padding: 6px;">S.Val</th>
-                                        <th style="padding: 6px;">S.Lot</th>
-                                        <th style="padding: 6px;">S.Freq</th>
-                                        <th style="padding: 6px;">S.Avg</th>
+                                        <th style="padding: 8px;">Broker</th>
+                                        <th style="padding: 8px;">Symbol</th>
+                                        <th style="padding: 8px;">S.Val</th>
+                                        <th style="padding: 8px;">S.Lot</th>
+                                        <th style="padding: 8px;">S.Freq</th>
+                                        <th style="padding: 8px;">S.Avg</th>
                                     </tr>
                                 </thead>
                                 <tbody id="tbody-top-sell"></tbody>
@@ -275,21 +277,21 @@
                 </div>
 
                 <!-- SPLIT VIEW FOR TOP STOCK (BUY / SELL) -->
-                <div id="topstock-tables-wrapper" style="display: none; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div id="topstock-tables-wrapper" style="display: none; grid-template-columns: 1fr 1fr; gap: 18px;">
                     <!-- KIRI (BUY) -->
-                    <div style="background: rgba(16, 185, 129, 0.03); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 12px; padding: 10px; overflow: hidden;">
-                        <div style="display: flex; align-items: center; gap: 6px; color: #34d399; font-weight: 800; font-size: 12px; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid rgba(16, 185, 129, 0.2);">
+                    <div style="background: rgba(16, 185, 129, 0.03); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 12px; padding: 12px; overflow: hidden;">
+                        <div style="display: flex; align-items: center; gap: 8px; color: #34d399; font-weight: 800; font-size: 16px; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid rgba(16, 185, 129, 0.2);">
                             <span>📈 TOP STOCK (BUY)</span>
                         </div>
-                        <div style="overflow-x: auto; max-height: 280px; overflow-y: auto;">
-                            <table style="width: 100%; border-collapse: collapse; font-size: 11px; text-align: left; color: #cbd5e1;">
+                        <div style="overflow-x: auto; max-height: 350px; overflow-y: auto;">
+                            <table style="width: 100%; border-collapse: collapse; font-size: 15px; text-align: left; color: #cbd5e1;">
                                 <thead style="position: sticky; top: 0; background: #0b1322; color: #34d399;">
                                     <tr>
-                                        <th style="padding: 6px;">Symbol</th>
-                                        <th style="padding: 6px;">T.Val</th>
-                                        <th style="padding: 6px;">T.Lot</th>
-                                        <th style="padding: 6px;">T.Freq</th>
-                                        <th style="padding: 6px;">Avg</th>
+                                        <th style="padding: 8px;">Symbol</th>
+                                        <th style="padding: 8px;">T.Val</th>
+                                        <th style="padding: 8px;">T.Lot</th>
+                                        <th style="padding: 8px;">T.Freq</th>
+                                        <th style="padding: 8px;">Avg</th>
                                     </tr>
                                 </thead>
                                 <tbody id="tbody-topstock-left"></tbody>
@@ -298,19 +300,19 @@
                     </div>
 
                     <!-- KANAN (SELL) -->
-                    <div style="background: rgba(239, 68, 68, 0.03); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 12px; padding: 10px; overflow: hidden;">
-                        <div style="display: flex; align-items: center; gap: 6px; color: #f87171; font-weight: 800; font-size: 12px; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid rgba(239, 68, 68, 0.2);">
+                    <div style="background: rgba(239, 68, 68, 0.03); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 12px; padding: 12px; overflow: hidden;">
+                        <div style="display: flex; align-items: center; gap: 8px; color: #f87171; font-weight: 800; font-size: 16px; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid rgba(239, 68, 68, 0.2);">
                             <span>📉 TOP STOCK (SELL)</span>
                         </div>
-                        <div style="overflow-x: auto; max-height: 280px; overflow-y: auto;">
-                            <table style="width: 100%; border-collapse: collapse; font-size: 11px; text-align: left; color: #cbd5e1;">
+                        <div style="overflow-x: auto; max-height: 350px; overflow-y: auto;">
+                            <table style="width: 100%; border-collapse: collapse; font-size: 15px; text-align: left; color: #cbd5e1;">
                                 <thead style="position: sticky; top: 0; background: #0b1322; color: #f87171;">
                                     <tr>
-                                        <th style="padding: 6px;">Symbol</th>
-                                        <th style="padding: 6px;">T.Val</th>
-                                        <th style="padding: 6px;">T.Lot</th>
-                                        <th style="padding: 6px;">T.Freq</th>
-                                        <th style="padding: 6px;">Avg</th>
+                                        <th style="padding: 8px;">Symbol</th>
+                                        <th style="padding: 8px;">T.Val</th>
+                                        <th style="padding: 8px;">T.Lot</th>
+                                        <th style="padding: 8px;">T.Freq</th>
+                                        <th style="padding: 8px;">Avg</th>
                                     </tr>
                                 </thead>
                                 <tbody id="tbody-topstock-right"></tbody>
@@ -340,12 +342,12 @@
         
         .dash-input-trans { 
             width: 100%; 
-            padding: 8px 12px; 
+            padding: 10px 14px; 
             background: rgba(15, 23, 42, 0.6) !important; 
             border: 1px solid rgba(56, 189, 248, 0.25) !important; 
             border-radius: 10px; 
             color: #f1f5f9 !important; 
-            font-size: 12px; 
+            font-size: 16px; 
             outline: none;
             backdrop-filter: blur(4px);
             transition: all 0.2s ease;
@@ -357,11 +359,11 @@
         .dash-input-trans option { background: #0f172a !important; color: #f1f5f9; }
         
         .action-btn { 
-            width: 100%; padding: 9px 12px; 
+            width: 100%; padding: 11px 14px; 
             background: rgba(255, 255, 255, 0.03); 
             border: 1px solid rgba(255, 255, 255, 0.06); 
             color: #cbd5e1; border-radius: 10px; text-align: left; 
-            cursor: pointer; font-size: 11px; font-weight: 600; transition: all 0.2s;
+            cursor: pointer; font-size: 15px; font-weight: 600; transition: all 0.2s;
         }
         .action-btn:hover { 
             background: rgba(16, 185, 129, 0.15); 
@@ -369,11 +371,11 @@
         }
         
         .action-btn-neon-emerald { 
-            width: 100%; padding: 10px; 
+            width: 100%; padding: 12px; 
             background: rgba(16, 185, 129, 0.22) !important; 
             color: #34d399 !important; 
             border: 1px solid rgba(16, 185, 129, 0.5) !important; 
-            border-radius: 10px; font-weight: 700; font-size: 11px; cursor: pointer; 
+            border-radius: 10px; font-weight: 700; font-size: 15px; cursor: pointer; 
             box-shadow: 0 0 15px rgba(16, 185, 129, 0.15); transition: all 0.25s ease;
             display: flex; align-items: center; justify-content: center; gap: 6px;
         }
@@ -383,11 +385,11 @@
         }
 
         .action-btn-neon-amber { 
-            width: 100%; padding: 10px; 
+            width: 100%; padding: 12px; 
             background: rgba(245, 158, 11, 0.2) !important; 
             color: #fbbf24 !important; 
             border: 1px solid rgba(245, 158, 11, 0.45) !important; 
-            border-radius: 10px; font-weight: 700; font-size: 11px; cursor: pointer; 
+            border-radius: 10px; font-weight: 700; font-size: 15px; cursor: pointer; 
             box-shadow: 0 0 15px rgba(245, 158, 11, 0.15); transition: all 0.25s ease;
             display: flex; align-items: center; justify-content: center; gap: 6px;
         }
@@ -396,7 +398,21 @@
             box-shadow: 0 0 22px rgba(245, 158, 11, 0.4);
         }
 
-        #preview-container td, #preview-container th { padding: 6px 10px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); white-space: nowrap; }
+        .action-btn-neon-blue { 
+            width: 100%; padding: 12px; 
+            background: rgba(56, 189, 248, 0.22) !important; 
+            color: #38bdf8 !important; 
+            border: 1px solid rgba(56, 189, 248, 0.5) !important; 
+            border-radius: 10px; font-weight: 700; font-size: 15px; cursor: pointer; 
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.15); transition: all 0.25s ease;
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+        }
+        .action-btn-neon-blue:hover { 
+            background: rgba(56, 189, 248, 0.38) !important; color: #fff !important;
+            box-shadow: 0 0 22px rgba(56, 189, 248, 0.4);
+        }
+
+        #preview-container td, #preview-container th { padding: 8px 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); white-space: nowrap; }
         #preview-container tbody tr:hover { background: rgba(255, 255, 255, 0.04); }
         .dash-input-trans::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
     `;
@@ -414,7 +430,13 @@
         log.innerText = `Status: ${msg}`;
     };
 
-    // 4. SCREENER AUTOMATION LOGIC (MODUL 1)
+    // 4. SCREENER AUTOMATION LOGIC (MODUL 1 - DIPICU DARI DROPDOWN)
+    window.runScreenerFromDropdown = async function() {
+        const selectedPreset = document.getElementById('screener-preset-select').value;
+        if (!selectedPreset) return;
+        await runScreenerAutomation(selectedPreset);
+    };
+
     window.runScreenerAutomation = async function(btnKey) {
         const cfg = SCREENER_CONFIGS[btnKey];
         if (!cfg) return;
@@ -855,11 +877,11 @@
                 const symbolColor = type === 'buy' ? '#34d399' : '#f87171'; // Hijau untuk Buy, Merah untuk Sell
                 return dataList.map(item => `
                     <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
-                        <td style="padding: 6px; font-weight: 700; color: ${symbolColor};">${item.symbol}</td>
-                        <td style="padding: 6px; color: #fff;">${item.tval}</td>
-                        <td style="padding: 6px; color: #cbd5e1;">${item.tlot}</td>
-                        <td style="padding: 6px; color: #cbd5e1;">${item.tfreq}</td>
-                        <td style="padding: 6px; color: #cbd5e1;">${item.avg}</td>
+                        <td style="padding: 8px; font-weight: 700; color: ${symbolColor};">${item.symbol}</td>
+                        <td style="padding: 8px; color: #fff;">${item.tval}</td>
+                        <td style="padding: 8px; color: #cbd5e1;">${item.tlot}</td>
+                        <td style="padding: 8px; color: #cbd5e1;">${item.tfreq}</td>
+                        <td style="padding: 8px; color: #cbd5e1;">${item.avg}</td>
                     </tr>
                 `).join('');
             };
@@ -892,8 +914,8 @@
         const thead = document.getElementById('preview-thead-single');
         const tbody = document.getElementById('preview-tbody-single');
 
-        thead.innerHTML = `<tr>${headers.map(h => `<th style="padding: 8px;">${h}</th>`).join('')}</tr>`;
-        tbody.innerHTML = rows.map(r => `<tr>${r.map(c => `<td style="padding: 6px 8px;">${c}</td>`).join('')}</tr>`).join('');
+        thead.innerHTML = `<tr>${headers.map(h => `<th style="padding: 10px;">${h}</th>`).join('')}</tr>`;
+        tbody.innerHTML = rows.map(r => `<tr>${r.map(c => `<td style="padding: 8px 10px;">${c}</td>`).join('')}</tr>`).join('');
     }
 
     function renderSplitPreviewTables(buyData, sellData) {
@@ -915,23 +937,23 @@
 
         tbodyBuy.innerHTML = buyData.map(d => `
             <tr>
-                <td style="padding: 6px; font-weight: 700; color: #10b981;">${d.broker}</td>
-                <td style="padding: 6px; font-weight: 700; color: #fff;">${d.symbol}</td>
-                <td style="padding: 6px;">${d.val}</td>
-                <td style="padding: 6px;">${d.lot}</td>
-                <td style="padding: 6px;">${d.freq}</td>
-                <td style="padding: 6px;">${d.avg}</td>
+                <td style="padding: 8px; font-weight: 700; color: #10b981;">${d.broker}</td>
+                <td style="padding: 8px; font-weight: 700; color: #fff;">${d.symbol}</td>
+                <td style="padding: 8px;">${d.val}</td>
+                <td style="padding: 8px;">${d.lot}</td>
+                <td style="padding: 8px;">${d.freq}</td>
+                <td style="padding: 8px;">${d.avg}</td>
             </tr>
         `).join('');
 
         tbodySell.innerHTML = sellData.map(d => `
             <tr>
-                <td style="padding: 6px; font-weight: 700; color: #ef4444;">${d.broker}</td>
-                <td style="padding: 6px; font-weight: 700; color: #fff;">${d.symbol}</td>
-                <td style="padding: 6px;">${d.val}</td>
-                <td style="padding: 6px;">${d.lot}</td>
-                <td style="padding: 6px;">${d.freq}</td>
-                <td style="padding: 6px;">${d.avg}</td>
+                <td style="padding: 8px; font-weight: 700; color: #ef4444;">${d.broker}</td>
+                <td style="padding: 8px; font-weight: 700; color: #fff;">${d.symbol}</td>
+                <td style="padding: 8px;">${d.val}</td>
+                <td style="padding: 8px;">${d.lot}</td>
+                <td style="padding: 8px;">${d.freq}</td>
+                <td style="padding: 8px;">${d.avg}</td>
             </tr>
         `).join('');
     }
