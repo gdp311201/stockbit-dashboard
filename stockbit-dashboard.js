@@ -75,10 +75,9 @@
     const overlay = document.createElement('div');
     overlay.id = 'sb-full-dashboard';
     
-    // Lebar diperbesar 1.5x lipat dari 960px menjadi 1440px
     overlay.style = `
         position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-        background: rgba(2, 6, 13, 0.45); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(2px);
+        background: rgba(2, 6, 13, 0.45); backdrop-filter: blur(1.5px); -webkit-backdrop-filter: blur(8px);
         z-index: 999999; color: #e2e8f0; font-family: 'Inter', system-ui, -apple-system, sans-serif;
         display: flex; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box;
     `;
@@ -106,9 +105,20 @@
                         <span style="font-size: 15px; font-weight: 600; color: #38bdf8; background: rgba(56, 189, 248, 0.12); border: 1px solid rgba(56, 189, 248, 0.25); padding: 4px 14px; border-radius: 20px; letter-spacing: 0.3px;">by Julyo Sechar</span>
                     </div>
                 </div>
-                <button onclick="document.getElementById('sb-full-dashboard').remove()" style="background: rgba(239, 68, 68, 0.12); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); padding: 8px 18px; border-radius: 20px; font-weight: 700; font-size: 16px; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.2s;" onmouseover="this.style.background='rgba(239, 68, 68, 0.25)';" onmouseout="this.style.background='rgba(239, 68, 68, 0.12)';">
-                    ⏻ Keluar
-                </button>
+                
+                <!-- GROUP TIMESTAMP & KELUAR -->
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div id="header-timestamp" style="font-size: 15px; font-weight: 600; color: #f1f5f9; background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.2); padding: 6px 16px; border-radius: 20px; display: flex; align-items: center; gap: 8px; letter-spacing: 0.3px; backdrop-filter: blur(4px); font-variant-numeric: tabular-nums; white-space: nowrap;">
+                        <span style="color: #38bdf8;">🕒</span>
+                        <span id="time-text" style="min-width: 70px; text-align: center;">--:--:--</span>
+                        <span style="color: #38bdf8;">WIB</span>
+                        <span style="color: rgba(255,255,255,0.2); margin: 0 2px;">|</span>
+                        <span id="date-text">Hari, Tgl Bln Thn</span>
+                    </div>
+                    <button id="btn-keluar" style="background: rgba(239, 68, 68, 0.12); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); padding: 8px 18px; border-radius: 20px; font-weight: 700; font-size: 16px; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.2s;" onmouseover="this.style.background='rgba(239, 68, 68, 0.25)';" onmouseout="this.style.background='rgba(239, 68, 68, 0.12)';">
+                        ⏻ Keluar
+                    </button>
+                </div>
             </div>
 
             <!-- CARDS GRID -->
@@ -428,6 +438,35 @@
         const colors = { info: '#10b981', warning: '#f59e0b', error: '#ef4444' };
         log.style.color = colors[type] || '#10b981';
         log.innerText = `Status: ${msg}`;
+    };
+
+    // 3B. LOGIKA TIMESTAMP REALTIME
+    const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+    const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+
+    window.updateDashboardTimestamp = function() {
+        const now = new Date();
+        const h = now.getHours().toString().padStart(2, '0');
+        const m = now.getMinutes().toString().padStart(2, '0');
+        const s = now.getSeconds().toString().padStart(2, '0');
+        const day = days[now.getDay()];
+        const date = now.getDate();
+        const month = months[now.getMonth()];
+        const year = now.getFullYear();
+
+        const timeEl = document.getElementById('time-text');
+        const dateEl = document.getElementById('date-text');
+        if (timeEl) timeEl.innerText = `${h}:${m}:${s}`;
+        if (dateEl) dateEl.innerText = `${day}, ${date} ${month} ${year}`;
+    };
+
+    window.updateDashboardTimestamp();
+    const timestampInterval = setInterval(window.updateDashboardTimestamp, 1000);
+
+    // Event listener Tombol Keluar kustom supaya membersihkan interval timestamp
+    document.getElementById('btn-keluar').onclick = () => {
+        clearInterval(timestampInterval);
+        document.getElementById('sb-full-dashboard').remove();
     };
 
     // 4. SCREENER AUTOMATION LOGIC (MODUL 1 - DIPICU DARI DROPDOWN)
