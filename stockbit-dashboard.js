@@ -21,7 +21,7 @@
             id: "14ryEGNhvwm9XCuw-lo6tSfwDqRmGAK_ZlUpuKd0Pm8M",
             sheet: "SC",
             startCol: "T",
-            gasUrl: "https://script.google.com/macros/s/AKfycby867iVRm0RlVnipq4obh9vaxfzy6nyIJ9DkENATabCCb4Af8G4ylQvxcWPgJWpg3OnRw/exec"
+            gasUrl: "https://script.google.com/macros/s/AKfycbwjY4Z65L4cd5kaUdh8lSuHP8JfUyT3zOjZpYOIqHIVpM4HSRTwJzbgJmvi1mF-YvPryw/exec"
         },
         "BD SANGKUT": {
             targetKeywords: ["BD - SANGKUT & AKUM", "BD SANGKUT", "BD - SANGKUT"],
