@@ -77,7 +77,7 @@
     
     overlay.style = `
         position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-        background: rgba(2, 6, 13, 0.45); backdrop-filter: blur(1.5px); -webkit-backdrop-filter: blur(8px);
+        background: rgba(2, 6, 13, 0.45); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(8px);
         z-index: 999999; color: #e2e8f0; font-family: 'Inter', system-ui, -apple-system, sans-serif;
         display: flex; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box;
     `;
