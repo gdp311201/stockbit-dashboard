@@ -77,7 +77,7 @@
     
     overlay.style = `
         position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-        background: rgba(2, 6, 13, 0.45); backdrop-filter: blur(0.75px); -webkit-backdrop-filter: blur(8px);
+        background: rgba(2, 6, 13, 0.45); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(8px);
         z-index: 999999; color: #e2e8f0; font-family: 'Inter', system-ui, -apple-system, sans-serif;
         display: flex; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box;
     `;
@@ -936,8 +936,54 @@
         `).join('');
     }
 
-    window.exportDataToGAS = function() {
-        updateLog(`Fitur Export ke Google Sheets siap dijalankan.`, 'info');
+    // 8. EXPORT TO GOOGLE SHEETS (FIXED & IMPLEMENTED)
+    window.exportDataToGAS = async function() {
+        const dateStr = document.getElementById('export-date').value;
+        const data = window.currentScrapedData;
+        const presetKey = window.currentPresetKey;
+        
+        // Validasi: Pastikan ada data Screener yang aktif
+        if (!data || data.length === 0) {
+            updateLog('Tidak ada data Screener untuk diexport! Silakan jalankan modul 01 terlebih dahulu.', 'warning');
+            return;
+        }
+        
+        // Validasi: Pastikan ada preset yang dipilih
+        if (!presetKey || !SCREENER_CONFIGS[presetKey]) {
+            updateLog('Preset Screener tidak ditemukan. Export dibatalkan.', 'error');
+            return;
+        }
+        
+        const cfg = SCREENER_CONFIGS[presetKey];
+        updateLog(`Mengirim ${data.length} baris data [${presetKey}] ke Google Sheets...`, 'info');
+        
+        // Payload yang dikirim ke Google Apps Script
+        const payload = {
+            spreadsheetId: cfg.id,
+            sheetName: cfg.sheet,
+            startCol: cfg.startCol,
+            date: dateStr,
+            data: data
+        };
+        
+        try {
+            // Menggunakan mode 'no-cors' dan Content-Type 'text/plain' 
+            // untuk menghindari error CORS dari Browser Extension/Console ke Google Apps Script
+            await fetch(cfg.gasUrl, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: {
+                    'Content-Type': 'text/plain;charset=utf-8'
+                },
+                body: JSON.stringify(payload)
+            });
+            
+            // Karena mode no-cors menghalangi pembacaan response, 
+            // kita asumsikan pengiriman berhasil jika tidak ada error network.
+            updateLog('Berhasil! Data Screener telah dikirim ke Google Sheets. Cek Spreadsheet Anda.', 'info');
+        } catch (err) {
+            updateLog(`Error kirim ke GSheet: ${err.message}`, 'error');
+        }
     };
 
 })();
