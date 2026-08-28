@@ -21,7 +21,7 @@
             id: "14ryEGNhvwm9XCuw-lo6tSfwDqRmGAK_ZlUpuKd0Pm8M",
             sheet: "SC",
             startCol: "T",
-            gasUrl: "https://script.google.com/macros/s/AKfycbxBmt9PR_jW3CwiiOKrel_clbUCTWGC2Br3ocvANT1pnrvqoqUr4HSuHNRhEYZZ0k7GHA/exec"
+            gasUrl: "https://script.google.com/macros/s/AKfycby867iVRm0RlVnipq4obh9vaxfzy6nyIJ9DkENATabCCb4Af8G4ylQvxcWPgJWpg3OnRw/exec"
         },
         "BD SANGKUT": {
             targetKeywords: ["BD - SANGKUT & AKUM", "BD SANGKUT", "BD - SANGKUT"],
@@ -77,7 +77,7 @@
     
     overlay.style = `
         position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-        background: rgba(2, 6, 13, 0.45); backdrop-filter: blur(0.75px); -webkit-backdrop-filter: blur(8px);
+        background: rgba(2, 6, 13, 0.45); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(8px);
         z-index: 999999; color: #e2e8f0; font-family: 'Inter', system-ui, -apple-system, sans-serif;
         display: flex; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box;
     `;
@@ -936,39 +936,42 @@
         `).join('');
     }
 
-    // 8. EXPORT TO GOOGLE SHEETS (FIXED & IMPLEMENTED)
+    // 8. EXPORT TO GOOGLE SHEETS (FORMAT TANGGAL 28 Aug 26)
     window.exportDataToGAS = async function() {
-        const dateStr = document.getElementById('export-date').value;
+        const rawDate = document.getElementById('export-date').value;
         const data = window.currentScrapedData;
         const presetKey = window.currentPresetKey;
         
-        // Validasi: Pastikan ada data Screener yang aktif
         if (!data || data.length === 0) {
-            updateLog('Tidak ada data Screener untuk diexport! Silakan jalankan modul 01 terlebih dahulu.', 'warning');
+            updateLog('Tidak ada data Screener untuk diexport! Jalankan Modul 01 terlebih dahulu.', 'warning');
             return;
         }
         
-        // Validasi: Pastikan ada preset yang dipilih
         if (!presetKey || !SCREENER_CONFIGS[presetKey]) {
             updateLog('Preset Screener tidak ditemukan. Export dibatalkan.', 'error');
             return;
         }
         
         const cfg = SCREENER_CONFIGS[presetKey];
-        updateLog(`Mengirim ${data.length} baris data [${presetKey}] ke Google Sheets...`, 'info');
-        
-        // Payload yang dikirim ke Google Apps Script
-        const payload = {
-            spreadsheetId: cfg.id,
-            sheetName: cfg.sheet,
-            startCol: cfg.startCol,
-            date: dateStr,
-            data: data
-        };
+        updateLog(`Menyiapkan & mengirim ${data.length} baris data [${presetKey}]...`, 'info');
         
         try {
-            // Menggunakan mode 'no-cors' dan Content-Type 'text/plain' 
-            // untuk menghindari error CORS dari Browser Extension/Console ke Google Apps Script
+            // 1. Ubah format tanggal dari "2026-08-28" menjadi "28 Aug 26"
+            const parts = rawDate.split('-'); // ["2026", "08", "28"]
+            const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            const formattedDateStr = `${parts[2]} ${months[parseInt(parts[1], 10) - 1]} ${parts[0].substring(2)}`;
+            
+            // 2. Sisipkan Tanggal yang sudah diformat di KOLOM PERTAMA setiap baris
+            const finalRows = data.map(rowArray => [formattedDateStr, ...rowArray]);
+            
+            // 3. Bentuk payload dengan key "rows"
+            const payload = {
+                sheetName: cfg.sheet,
+                startCol: cfg.startCol,
+                rows: finalRows
+            };
+            
+            // 4. Kirim ke GAS
             await fetch(cfg.gasUrl, {
                 method: 'POST',
                 mode: 'no-cors',
@@ -978,9 +981,7 @@
                 body: JSON.stringify(payload)
             });
             
-            // Karena mode no-cors menghalangi pembacaan response, 
-            // kita asumsikan pengiriman berhasil jika tidak ada error network.
-            updateLog('Berhasil! Data Screener telah dikirim ke Google Sheets. Cek Spreadsheet Anda.', 'info');
+            updateLog('Berhasil! Data dengan format tanggal (28 Aug 26) telah dikirim. Cek Spreadsheet Anda.', 'info');
         } catch (err) {
             updateLog(`Error kirim ke GSheet: ${err.message}`, 'error');
         }
